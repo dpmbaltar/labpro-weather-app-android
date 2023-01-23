@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">WeatherApp</string>
+    <string name="current">Actual</string>
+    <string name="forecast">Semanal</string>
+    <string name="history">Histórico</string>
+    <string name="condition_text">Condición actual</string>
+    <string name="loading_text">Mirando el cielo...</string>
+    <string name="uv_index">Índice UV</string>
+    <string name="wind">Viento</string>
+    <string name="humidity">Humedad</string>
+</resources>
