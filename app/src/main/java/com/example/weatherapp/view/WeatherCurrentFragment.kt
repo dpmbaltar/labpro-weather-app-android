@@ -6,18 +6,20 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import com.example.weatherapp.databinding.FragmentCurrentWeatherBinding
-import com.example.weatherapp.viewmodel.CurrentWeatherViewModel
+import com.example.weatherapp.databinding.FragmentWeatherCurrentBinding
+import com.example.weatherapp.viewmodel.WeatherCurrentViewModel
 import com.google.android.material.snackbar.Snackbar
+import dagger.hilt.android.AndroidEntryPoint
 
-class CurrentWeatherFragment : Fragment() {
+@AndroidEntryPoint
+class WeatherCurrentFragment : Fragment() {
 
     companion object {
-        fun newInstance() = CurrentWeatherFragment()
+        fun newInstance() = WeatherCurrentFragment()
     }
 
-    private lateinit var viewModel: CurrentWeatherViewModel
-    private var _binding: FragmentCurrentWeatherBinding? = null
+    private lateinit var viewModel: WeatherCurrentViewModel
+    private var _binding: FragmentWeatherCurrentBinding? = null
 
     // This property is only valid between onCreateView and
     // onDestroyView.
@@ -25,9 +27,8 @@ class CurrentWeatherFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        viewModel = ViewModelProvider(this)[CurrentWeatherViewModel::class.java].apply {
-            getConditions()
-            getCurrentWeather()
+        viewModel = ViewModelProvider(this)[WeatherCurrentViewModel::class.java].apply {
+
         }
     }
 
@@ -35,20 +36,23 @@ class CurrentWeatherFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        _binding = FragmentCurrentWeatherBinding.inflate(inflater, container, false)
+        _binding = FragmentWeatherCurrentBinding.inflate(inflater, container, false)
         val root = binding.root
 
-        viewModel.weather.observe(viewLifecycleOwner) {
+        viewModel.current.observe(viewLifecycleOwner) {
             binding.temperature.text = "%.1f °C".format(it.temperature)
             binding.uv.text = "%d".format(it.uv)
             binding.windspeed.text = "%.1f km/h".format(it.windSpeed)
             binding.humidity.text = "%.1f %%".format(it.humidity)
-            binding.conditionText.text = viewModel.conditionText(it.weatherCode, it.isDay)
             binding.loading.visibility = View.GONE
         }
 
+        viewModel.conditionText.observe(viewLifecycleOwner) {
+            binding.conditionText.text = it
+        }
+
         viewModel.error.observe(viewLifecycleOwner) {
-            Snackbar.make(root, "Error", Snackbar.LENGTH_LONG)
+            Snackbar.make(root, it?:"Error", Snackbar.LENGTH_LONG)
                 .setAction("Action", null).show()
         }
 

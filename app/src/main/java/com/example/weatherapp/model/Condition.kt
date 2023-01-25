@@ -1,6 +1,6 @@
 package com.example.weatherapp.model
 
-data class ConditionModel(
+data class Condition(
     val code: Int,
     val day: String,
     val night: String,
