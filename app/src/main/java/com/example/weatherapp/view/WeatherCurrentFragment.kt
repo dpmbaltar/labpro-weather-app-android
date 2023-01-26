@@ -6,10 +6,12 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import com.example.weatherapp.R
 import com.example.weatherapp.databinding.FragmentWeatherCurrentBinding
 import com.example.weatherapp.viewmodel.WeatherCurrentViewModel
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
+import java.text.DecimalFormat
 
 @AndroidEntryPoint
 class WeatherCurrentFragment : Fragment() {
@@ -20,16 +22,11 @@ class WeatherCurrentFragment : Fragment() {
 
     private lateinit var viewModel: WeatherCurrentViewModel
     private var _binding: FragmentWeatherCurrentBinding? = null
-
-    // This property is only valid between onCreateView and
-    // onDestroyView.
     private val binding get() = _binding!!
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        viewModel = ViewModelProvider(this)[WeatherCurrentViewModel::class.java].apply {
-
-        }
+        viewModel = ViewModelProvider(this)[WeatherCurrentViewModel::class.java]
     }
 
     override fun onCreateView(
@@ -38,13 +35,16 @@ class WeatherCurrentFragment : Fragment() {
     ): View? {
         _binding = FragmentWeatherCurrentBinding.inflate(inflater, container, false)
         val root = binding.root
+        val decimal = DecimalFormat("0.#")
 
         viewModel.current.observe(viewLifecycleOwner) {
-            binding.temperature.text = "%.1f °C".format(it.temperature)
-            binding.uv.text = "%d".format(it.uv)
-            binding.windspeed.text = "%.1f km/h".format(it.windSpeed)
-            binding.humidity.text = "%.1f %%".format(it.humidity)
-            binding.loading.visibility = View.GONE
+            with (binding) {
+                temperature.text = getString(R.string.deg_celsius, decimal.format(it.temperature))
+                uv.text = decimal.format(it.uv)
+                windspeed.text = getString(R.string.km_hour, decimal.format(it.windSpeed))
+                humidity.text = getString(R.string.percent, decimal.format(it.humidity))
+                loading.visibility = View.GONE
+            }
         }
 
         viewModel.conditionText.observe(viewLifecycleOwner) {
@@ -53,16 +53,11 @@ class WeatherCurrentFragment : Fragment() {
 
         viewModel.error.observe(viewLifecycleOwner) {
             Snackbar.make(root, it?:"Error", Snackbar.LENGTH_LONG)
-                .setAction("Action", null).show()
+                .setAction("Action", null)
+                .show()
         }
 
         return root
     }
-
-    /*override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-        viewModel = ViewModelProvider(this).get(CurrentWeatherViewModel::class.java)
-        // TODO: Use the ViewModel
-    }*/
 
 }

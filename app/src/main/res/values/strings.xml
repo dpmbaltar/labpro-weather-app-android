@@ -8,4 +8,7 @@
     <string name="uv_index">Índice UV</string>
     <string name="wind">Viento</string>
     <string name="humidity">Humedad</string>
+    <string name="deg_celsius">%1$s °C</string>
+    <string name="km_hour">%1$s km/h</string>
+    <string name="percent">%1$s %%</string>
 </resources>
