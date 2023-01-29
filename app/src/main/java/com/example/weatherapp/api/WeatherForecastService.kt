@@ -1,7 +1,7 @@
 package com.example.weatherapp.api
 
-import com.example.weatherapp.model.Condition
-import com.example.weatherapp.model.WeatherCurrentResponse
+import com.example.weatherapp.model.WeatherCondition
+import com.example.weatherapp.model.CurrentWeatherResponse
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import okhttp3.logging.HttpLoggingInterceptor.Level
@@ -14,13 +14,13 @@ import retrofit2.http.Query
 interface WeatherForecastService {
 
     @GET("/api/weather/conditions")
-    suspend fun conditions(): Response<List<Condition>>
+    suspend fun conditions(): Response<List<WeatherCondition>>
 
     @GET("/api/weather/current")
     suspend fun current(
         @Query("latitude") latitude: Double,
         @Query("longitude") longitude: Double
-    ): Response<WeatherCurrentResponse>
+    ): Response<CurrentWeatherResponse>
 
     companion object {
         private const val BASE_URL = "http://192.168.0.239:9000/"

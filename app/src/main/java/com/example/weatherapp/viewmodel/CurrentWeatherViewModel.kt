@@ -1,10 +1,9 @@
 package com.example.weatherapp.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.*
-import com.example.weatherapp.model.Condition
-import com.example.weatherapp.model.Current
-import com.example.weatherapp.model.Location
+import com.example.weatherapp.model.WeatherCondition
+import com.example.weatherapp.model.CurrentWeather
+import com.example.weatherapp.model.WeatherLocation
 import com.example.weatherapp.model.WeatherForecastRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -14,14 +13,14 @@ import java.io.IOException
 import javax.inject.Inject
 
 @HiltViewModel
-class WeatherCurrentViewModel @Inject constructor(
+class CurrentWeatherViewModel @Inject constructor(
     private val weatherForecastRepository: WeatherForecastRepository
 ) : ViewModel() {
 
-    private val conditions = HashMap<Int, Condition>()
+    private val conditions = HashMap<Int, WeatherCondition>()
     val error = MutableLiveData<String>()
-    val location = MutableLiveData<Location>()
-    val current = MutableLiveData<Current>()
+    val location = MutableLiveData<WeatherLocation>()
+    val current = MutableLiveData<CurrentWeather>()
     val conditionText: LiveData<String> = Transformations.map(current) {
         it?.let {
             conditions[it.weatherCode]?.let { condition ->

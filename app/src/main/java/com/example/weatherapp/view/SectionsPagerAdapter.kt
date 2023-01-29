@@ -23,7 +23,8 @@ class SectionsPagerAdapter(private val context: Context, fm: FragmentManager) :
         // getItem is called to instantiate the fragment for the given page.
         // Return a PlaceholderFragment (defined as a static inner class below).
         return when (position) {
-            0 -> return WeatherCurrentFragment.newInstance()
+            0 -> return CurrentWeatherFragment.newInstance()
+            1 -> return DailyWeatherFragment.newInstance()
             else -> PlaceholderFragment.newInstance(position + 1)
         }
     }

@@ -1,6 +1,6 @@
 package com.example.weatherapp.model
 
-data class Location(
+data class WeatherLocation(
     val name: String,
     val region: String,
     val country: String,

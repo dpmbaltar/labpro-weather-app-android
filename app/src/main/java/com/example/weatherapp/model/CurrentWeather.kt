@@ -1,6 +1,6 @@
 package com.example.weatherapp.model
 
-data class Current(
+data class CurrentWeather(
     val time: String,
     val temperature: Double,
     val apparentTemperature: Double,
