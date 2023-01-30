@@ -13,5 +13,6 @@ data class DailyWeather(
     val windSpeedMax: Double,
     val windGustsMax: Double,
     val windDirection: Double,
-    val weatherCode: Int
+    val conditionText: String,
+    val conditionIcon: Int
 )

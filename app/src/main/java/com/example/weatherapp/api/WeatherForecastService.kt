@@ -1,6 +1,5 @@
 package com.example.weatherapp.api
 
-import com.example.weatherapp.model.WeatherCondition
 import com.example.weatherapp.model.CurrentWeatherResponse
 import com.example.weatherapp.model.DailyWeatherResponse
 import okhttp3.OkHttpClient
@@ -13,9 +12,6 @@ import retrofit2.http.GET
 import retrofit2.http.Query
 
 interface WeatherForecastService {
-
-    @GET("/api/weather/conditions")
-    suspend fun conditions(): Response<List<WeatherCondition>>
 
     @GET("/api/weather/current")
     suspend fun current(

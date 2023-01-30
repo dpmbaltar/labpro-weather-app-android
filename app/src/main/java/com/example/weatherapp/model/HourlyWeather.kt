@@ -13,5 +13,6 @@ data class HourlyWeather(
     val windSpeed: List<Double>,
     val windDirection: List<Double>,
     val windGusts: List<Double>,
-    val weatherCode: List<Int>
+    val conditionText: List<String>,
+    val conditionIcon: List<Int>
 )

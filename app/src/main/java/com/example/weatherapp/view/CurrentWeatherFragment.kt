@@ -34,11 +34,11 @@ class CurrentWeatherFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         _binding = FragmentCurrentWeatherBinding.inflate(inflater, container, false)
-        val root = binding.root
         val decimal = DecimalFormat("0.#")
 
         viewModel.current.observe(viewLifecycleOwner) {
             with (binding) {
+                conditionText.text = it.conditionText
                 temperature.text = getString(R.string.deg_celsius, decimal.format(it.temperature))
                 uv.text = decimal.format(it.uv)
                 windspeed.text = getString(R.string.km_hour, decimal.format(it.windSpeed))
@@ -47,17 +47,13 @@ class CurrentWeatherFragment : Fragment() {
             }
         }
 
-        viewModel.conditionText.observe(viewLifecycleOwner) {
-            binding.conditionText.text = it
-        }
-
         viewModel.error.observe(viewLifecycleOwner) {
-            Snackbar.make(root, it?:"Error", Snackbar.LENGTH_LONG)
+            Snackbar.make(binding.root, it?:"Error", Snackbar.LENGTH_LONG)
                 .setAction("Action", null)
                 .show()
         }
 
-        return root
+        return binding.root
     }
 
 }

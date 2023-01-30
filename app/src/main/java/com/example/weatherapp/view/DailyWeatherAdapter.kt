@@ -54,6 +54,7 @@ class DailyWeatherAdapter(
         fun bind(dailyWeather: DailyWeather) {
             with(binding) {
                 // TODO: Bind other fields
+                conditionText.text = dailyWeather.conditionText
                 temperatureMax.text =
                     getString(R.string.deg_celsius, decimal.format(dailyWeather.temperatureMax))
             }

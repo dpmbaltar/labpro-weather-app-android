@@ -10,5 +10,6 @@ data class CurrentWeather(
     val windDirection: Double,
     val uv: Int,
     val isDay: Boolean,
-    val weatherCode: Int
+    val conditionText: String,
+    val conditionIcon: Int
 )
