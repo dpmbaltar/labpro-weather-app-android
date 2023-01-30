@@ -2,6 +2,7 @@ package com.example.weatherapp.api
 
 import com.example.weatherapp.model.WeatherCondition
 import com.example.weatherapp.model.CurrentWeatherResponse
+import com.example.weatherapp.model.DailyWeatherResponse
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import okhttp3.logging.HttpLoggingInterceptor.Level
@@ -21,6 +22,12 @@ interface WeatherForecastService {
         @Query("latitude") latitude: Double,
         @Query("longitude") longitude: Double
     ): Response<CurrentWeatherResponse>
+
+    @GET("/api/weather/daily")
+    suspend fun daily(
+        @Query("latitude") latitude: Double,
+        @Query("longitude") longitude: Double
+    ): Response<DailyWeatherResponse>
 
     companion object {
         private const val BASE_URL = "http://192.168.0.239:9000/"

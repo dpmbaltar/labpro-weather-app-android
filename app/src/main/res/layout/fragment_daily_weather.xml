@@ -5,9 +5,12 @@
     android:layout_height="match_parent"
     tools:context=".view.DailyWeatherFragment">
 
-    <TextView
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/daily_weather"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="Hello" />
+        android:clipToPadding="false"
+        tools:listitem="@layout/daily_weather_item"
+        tools:itemCount="7" />
 
 </FrameLayout>

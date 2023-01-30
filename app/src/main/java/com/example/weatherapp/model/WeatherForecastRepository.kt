@@ -15,4 +15,8 @@ class WeatherForecastRepository @Inject constructor(
     suspend fun getCurrent(latitude: Double, longitude: Double): Response<CurrentWeatherResponse> {
         return weatherForecastService.current(latitude, longitude)
     }
+
+    suspend fun getDaily(latitude: Double, longitude: Double): Response<DailyWeatherResponse> {
+        return weatherForecastService.daily(latitude, longitude)
+    }
 }
