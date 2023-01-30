@@ -44,7 +44,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="top"
         android:layout_margin="10dp"
-        app:cardCornerRadius="20dp"
+        app:cardCornerRadius="10dp"
         app:cardElevation="10dp">
 
         <LinearLayout
@@ -57,19 +57,21 @@
                 android:id="@+id/condition_icon"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:contentDescription="@string/condition_text"/>
+                android:contentDescription="@string/condition_text" />
 
             <TextView
                 android:id="@+id/temperature"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textSize="@dimen/text_size_large" />
+                android:textSize="@dimen/text_size_large"
+                tools:text="@sample/current_weather.json/data/temperature" />
 
             <TextView
                 android:id="@+id/condition_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textSize="@dimen/text_size_big" />
+                android:textSize="@dimen/text_size_big"
+                tools:text="@sample/current_weather.json/data/conditionText" />
 
         </LinearLayout>
 
@@ -80,7 +82,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="top"
         android:layout_margin="10dp"
-        app:cardCornerRadius="20dp"
+        app:cardCornerRadius="10dp"
         app:cardElevation="10dp">
 
         <LinearLayout
@@ -108,7 +110,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:textSize="@dimen/text_size_medium"
-                    android:textAlignment="center" />
+                    android:textAlignment="center"
+                    tools:text="@sample/current_weather.json/data/uv" />
 
             </LinearLayout>
 
@@ -136,7 +139,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:textSize="@dimen/text_size_medium"
-                    android:textAlignment="center" />
+                    android:textAlignment="center"
+                    tools:text="@sample/current_weather.json/data/windSpeed" />
 
             </LinearLayout>
 
@@ -164,7 +168,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:textSize="@dimen/text_size_medium"
-                    android:textAlignment="center" />
+                    android:textAlignment="center"
+                    tools:text="@sample/current_weather.json/data/humidity" />
 
             </LinearLayout>
 
