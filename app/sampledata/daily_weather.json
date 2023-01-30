@@ -1,0 +1,40 @@
+{
+  "comment": "Daily weather sample data",
+  "data": [
+    {
+      "conditionText": "Soleado",
+      "temperatureMax": "32,8 °C",
+      "temperatureMin": "21,6 °C"
+    },
+    {
+      "conditionText": "Generalmente soleado",
+      "temperatureMax": "16,4 °C",
+      "temperatureMin": "27,3 °C"
+    },
+    {
+      "conditionText": "Parcialmente nublado",
+      "temperatureMax": "16,4 °C",
+      "temperatureMin": "25,3 °C"
+    },
+    {
+      "conditionText": "Nublado",
+      "temperatureMax": "10,1 °C",
+      "temperatureMin": "21,2 °C"
+    },
+    {
+      "conditionText": "Llovizna moderada",
+      "temperatureMax": "12,4 °C",
+      "temperatureMin": "18,6 °C"
+    },
+    {
+      "conditionText": "Lluvia fuerte",
+      "temperatureMax": "16,1 °C",
+      "temperatureMin": "26,9 °C"
+    },
+    {
+      "conditionText": "Nevada ligera",
+      "temperatureMax": "2,2 °C",
+      "temperatureMin": "-7,7 °C"
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "comment": "Current weather sample data",
+  "data": [
+    {
+      "conditionText": "Soleado",
+      "temperature": "36,4 °C",
+      "apparentTemperature": "38,2 °C",
+      "precipitation": "10 %",
+      "humidity": "30 %",
+      "windSpeed": "17,3 km/h",
+      "windDirection": "90",
+      "uv": 8,
+      "isDay": true,
+      "weatherCode": 0
+    }
+  ]
+}
