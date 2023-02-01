@@ -6,10 +6,10 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.weatherapp.databinding.FragmentDailyWeatherBinding
 import com.example.weatherapp.viewmodel.DailyWeatherViewModel
-import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -34,10 +34,12 @@ class DailyWeatherFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         _binding = FragmentDailyWeatherBinding.inflate(inflater, container, false)
+        val view = binding.root
 
         val dailyWeatherAdapter = DailyWeatherAdapter {
-            Snackbar.make(binding.root, "Hola", Snackbar.LENGTH_LONG)
-                .setAction("Action", null).show()
+            val action = DailyWeatherFragmentDirections
+                .actionDailyWeatherFragmentToHourlyWeatherFragment()
+            view.findNavController().navigate(action)
         }
 
         val recyclerView = binding.dailyWeather
@@ -48,7 +50,6 @@ class DailyWeatherFragment : Fragment() {
             dailyWeatherAdapter.submitList(it)
         }
 
-        return binding.root
+        return view
     }
-
 }
