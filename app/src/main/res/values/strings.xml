@@ -11,4 +11,6 @@
     <string name="deg_celsius">%1$s °C</string>
     <string name="km_hour">%1$s km/h</string>
     <string name="percent">%1$s %%</string>
+    <string name="tabs_description">Clima actual, semanal e histórico</string>
+    <string name="weather">Clima</string>
 </resources>
