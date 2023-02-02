@@ -40,7 +40,7 @@ class CurrentWeatherFragment : Fragment() {
         viewModel.current.observe(viewLifecycleOwner) {
             with(binding) {
                 temperature.setCompoundDrawablesWithIntrinsicBounds(
-                    WeatherIcon.getDrawable(it.conditionIcon),
+                    WeatherIcon.getDrawable(it.conditionIcon, it.isDay),
                     0,
                     0,
                     0
