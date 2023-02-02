@@ -2,6 +2,7 @@ package com.example.weatherapp.api
 
 import com.example.weatherapp.model.CurrentWeatherResponse
 import com.example.weatherapp.model.DailyWeatherResponse
+import com.example.weatherapp.model.HourlyWeatherResponse
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import okhttp3.logging.HttpLoggingInterceptor.Level
@@ -9,6 +10,7 @@ import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
+import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface WeatherForecastService {
@@ -24,6 +26,15 @@ interface WeatherForecastService {
         @Query("latitude") latitude: Double,
         @Query("longitude") longitude: Double
     ): Response<DailyWeatherResponse>
+
+    @GET("/api/weather/hourly/{year}/{month}/{day}")
+    suspend fun hourly(
+        @Path("year") year: Int,
+        @Path("month") month: Int,
+        @Path("day") day: Int,
+        @Query("latitude") latitude: Double,
+        @Query("longitude") longitude: Double,
+    ): Response<HourlyWeatherResponse>
 
     companion object {
         private const val BASE_URL = "http://192.168.0.239:9000/"

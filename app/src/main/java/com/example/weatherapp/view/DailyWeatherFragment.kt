@@ -11,13 +11,10 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.weatherapp.databinding.FragmentDailyWeatherBinding
 import com.example.weatherapp.viewmodel.DailyWeatherViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import java.util.*
 
 @AndroidEntryPoint
 class DailyWeatherFragment : Fragment() {
-
-    companion object {
-        fun newInstance() = DailyWeatherFragment()
-    }
 
     private lateinit var viewModel: DailyWeatherViewModel
     private var _binding: FragmentDailyWeatherBinding? = null
@@ -36,10 +33,22 @@ class DailyWeatherFragment : Fragment() {
         _binding = FragmentDailyWeatherBinding.inflate(inflater, container, false)
         val view = binding.root
 
-        val dailyWeatherAdapter = DailyWeatherAdapter {
-            val action = DailyWeatherFragmentDirections
-                .actionDailyWeatherFragmentToHourlyWeatherFragment()
-            view.findNavController().navigate(action)
+        val dailyWeatherAdapter = DailyWeatherAdapter { _, position ->
+            viewModel.location.value?.let { location ->
+                viewModel.daily.value?.let {
+                    val daily = it[position]
+                    val date = daily.time ?: Calendar.getInstance().toString()
+                    val action = DailyWeatherFragmentDirections
+                        .actionDailyWeatherFragmentToHourlyWeatherFragment(
+                            latitude = location.latitude.toFloat(),
+                            longitude = location.longitude.toFloat(),
+                            date = date,
+                            sunrise = daily.sunrise,
+                            sunset = daily.sunset
+                        )
+                    view.findNavController().navigate(action)
+                }
+            }
         }
 
         val recyclerView = binding.dailyWeather

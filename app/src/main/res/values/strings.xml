@@ -13,4 +13,7 @@
     <string name="percent">%1$s %%</string>
     <string name="tabs_description">Clima actual, semanal e histórico</string>
     <string name="weather">Clima</string>
+    <string name="go_back">Volver atrás</string>
+    <string name="sunrise">Amanecer</string>
+    <string name="sunset">Ocaso</string>
 </resources>

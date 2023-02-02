@@ -2,6 +2,7 @@ package com.example.weatherapp.model
 
 import com.example.weatherapp.api.WeatherForecastService
 import retrofit2.Response
+import java.util.*
 import javax.inject.Inject
 
 class WeatherForecastRepository @Inject constructor(
@@ -14,5 +15,15 @@ class WeatherForecastRepository @Inject constructor(
 
     suspend fun getDaily(latitude: Double, longitude: Double): Response<DailyWeatherResponse> {
         return weatherForecastService.daily(latitude, longitude)
+    }
+
+    suspend fun getHourly(latitude: Double, longitude: Double, date: Calendar): Response<HourlyWeatherResponse> {
+        return weatherForecastService.hourly(
+            date.get(Calendar.YEAR),
+            date.get(Calendar.MONTH) + 1,
+            date.get(Calendar.DAY_OF_MONTH),
+            latitude,
+            longitude
+        )
     }
 }

@@ -28,25 +28,50 @@
             tools:srcCompat="@drawable/wi_day_113" />
 
         <TextView
-            android:id="@+id/temperature_max"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:layout_marginTop="10dp"
-            android:layout_toEndOf="@id/condition_icon"
-            android:textSize="@dimen/text_size_big"
-            tools:text="@sample/daily_weather.json/data/temperatureMax" />
-
-        <TextView
             android:id="@+id/condition_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/temperature_max"
-            android:layout_marginStart="10dp"
-            android:layout_marginTop="10dp"
+            android:layout_below="@id/date"
             android:layout_toEndOf="@id/condition_icon"
+            android:layout_marginEnd="10dp"
             android:textSize="@dimen/text_size_medium"
             tools:text="@sample/daily_weather.json/data/conditionText" />
+
+        <TextView
+            android:id="@+id/date"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@id/condition_icon"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="10dp"
+            android:textSize="@dimen/text_size_regular"
+            tools:text="@sample/daily_weather.json/data/time" />
+
+        <TextView
+            android:id="@+id/temperature_max"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/condition_text"
+            android:layout_toEndOf="@id/condition_icon"
+            android:layout_marginEnd="10dp"
+            android:textSize="@dimen/text_size_medium"
+            android:textStyle="bold"
+            android:drawablePadding="4dp"
+            app:drawableLeftCompat="@drawable/bi_thermometer_max"
+            tools:text="@sample/daily_weather.json/data/temperatureMax" />
+
+        <TextView
+            android:id="@+id/temperature_min"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/condition_text"
+            android:layout_toEndOf="@id/temperature_max"
+            android:layout_marginEnd="10dp"
+            android:textSize="@dimen/text_size_medium"
+            android:textStyle="bold"
+            android:drawablePadding="4dp"
+            app:drawableLeftCompat="@drawable/bi_thermometer_min"
+            tools:text="@sample/daily_weather.json/data/temperatureMin" />
 
     </RelativeLayout>
 
