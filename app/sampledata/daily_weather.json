@@ -2,39 +2,46 @@
   "comment": "Daily weather sample data",
   "data": [
     {
-      "conditionText": "Soleado",
+      "time": "Lunes 28",
       "temperatureMax": "32,8 °C",
-      "temperatureMin": "21,6 °C"
+      "temperatureMin": "21,6 °C",
+      "conditionText": "Soleado"
     },
     {
-      "conditionText": "Generalmente soleado",
+      "time": "Martes 29",
       "temperatureMax": "16,4 °C",
-      "temperatureMin": "27,3 °C"
+      "temperatureMin": "27,3 °C",
+      "conditionText": "Generalmente soleado"
     },
     {
-      "conditionText": "Parcialmente nublado",
+      "time": "Miércoles 1",
       "temperatureMax": "16,4 °C",
-      "temperatureMin": "25,3 °C"
+      "temperatureMin": "25,3 °C",
+      "conditionText": "Parcialmente nublado"
     },
     {
-      "conditionText": "Nublado",
+      "time": "Jueves 2",
       "temperatureMax": "10,1 °C",
-      "temperatureMin": "21,2 °C"
+      "temperatureMin": "21,2 °C",
+      "conditionText": "Nublado"
     },
     {
-      "conditionText": "Llovizna moderada",
+      "time": "Viernes 3",
       "temperatureMax": "12,4 °C",
-      "temperatureMin": "18,6 °C"
+      "temperatureMin": "18,6 °C",
+      "conditionText": "Llovizna moderada"
     },
     {
-      "conditionText": "Lluvia fuerte",
+      "time": "Sábado 4",
       "temperatureMax": "16,1 °C",
-      "temperatureMin": "26,9 °C"
+      "temperatureMin": "26,9 °C",
+      "conditionText": "Lluvia fuerte"
     },
     {
-      "conditionText": "Nevada ligera",
+      "time": "Domingo 5",
       "temperatureMax": "2,2 °C",
-      "temperatureMin": "-7,7 °C"
+      "temperatureMin": "-7,7 °C",
+      "conditionText": "Nevada ligera"
     }
   ]
 }

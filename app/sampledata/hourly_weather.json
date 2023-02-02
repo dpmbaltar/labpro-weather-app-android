@@ -1,0 +1,61 @@
+{
+  "comment": "Hourly weather sample data",
+  "data": [
+    {
+      "time": "00:00",
+      "conditionText": "Soleado",
+      "temperature": "32,8 °C",
+      "apparentTemperature": "34,6 °C",
+      "precipitation": "0 %",
+      "windSpeed": "17,3 km/h"
+    },
+    {
+      "time": "01:00",
+      "conditionText": "Generalmente soleado",
+      "temperature": "16,4 °C",
+      "apparentTemperature": "17,3 °C",
+      "precipitation": "30 %",
+      "windSpeed": "6,7 km/h"
+    },
+    {
+      "time": "02:00",
+      "conditionText": "Parcialmente nublado",
+      "temperature": "16,4 °C",
+      "apparentTemperature": "19,3 °C",
+      "precipitation": "60 %",
+      "windSpeed": "27,1 km/h"
+    },
+    {
+      "time": "03:00",
+      "conditionText": "Nublado",
+      "temperature": "10,1 °C",
+      "apparentTemperature": "11,2 °C",
+      "precipitation": "100 %",
+      "windSpeed": "0,5 km/h"
+    },
+    {
+      "time": "04:00",
+      "conditionText": "Llovizna moderada",
+      "temperature": "12,4 °C",
+      "apparentTemperature": "11,6 °C",
+      "precipitation": "10 %",
+      "windSpeed": "10,0 km/h"
+    },
+    {
+      "time": "05:00",
+      "conditionText": "Lluvia fuerte",
+      "temperature": "16,1 °C",
+      "apparentTemperature": "18,9 °C",
+      "precipitation": "10 %",
+      "windSpeed": "45,1 km/h"
+    },
+    {
+      "time": "06:00",
+      "conditionText": "Nevada ligera",
+      "temperature": "2,2 °C",
+      "apparentTemperature": "-5,7 °C",
+      "precipitation": "10 %",
+      "windSpeed": "101,9 km/h"
+    }
+  ]
+}
