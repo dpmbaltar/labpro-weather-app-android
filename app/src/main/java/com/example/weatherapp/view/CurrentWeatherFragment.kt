@@ -6,14 +6,15 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.distinctUntilChanged
 import androidx.lifecycle.lifecycleScope
-import com.example.weatherapp.R
+import androidx.lifecycle.map
 import com.example.weatherapp.databinding.FragmentCurrentWeatherBinding
+import com.example.weatherapp.util.WeatherIcon
 import com.example.weatherapp.viewmodel.CurrentWeatherViewModel
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import java.text.DecimalFormat
 
 @AndroidEntryPoint
 class CurrentWeatherFragment : Fragment() {
@@ -43,30 +44,35 @@ class CurrentWeatherFragment : Fragment() {
                 lifecycleScope.launch { viewModel.refresh() }
             }
         }
-        val decimal = DecimalFormat("0.#")
 
-        viewModel.refreshing.observe(viewLifecycleOwner) {
+        viewModel.uiState.map {
+            it.isRefreshing
+        }.distinctUntilChanged().observe(viewLifecycleOwner) {
             refreshView.isRefreshing = it
         }
 
-        viewModel.current.observe(viewLifecycleOwner) {
-            with(it) {
-                val iconId = WeatherIcon.getDrawable(conditionIcon, isDay)
-                binding.temperature.setCompoundDrawablesWithIntrinsicBounds(iconId, 0, 0, 0)
-                binding.temperature.text = getString(R.string.deg_celsius, decimal.format(temperature))
-                binding.conditionText.text = conditionText
-                binding.uv.text = decimal.format(uv)
-                binding.windSpeed.text = getString(R.string.km_hour, decimal.format(windSpeed))
-                binding.humidity.text = getString(R.string.percent, decimal.format(humidity))
-                binding.currentWeatherLayout.visibility = View.VISIBLE
+        viewModel.uiState.observe(viewLifecycleOwner) {
+            if (it.isFailed) {
+                binding.currentWeatherLayout.visibility = View.GONE
+                Snackbar.make(view, it.lastError, Snackbar.LENGTH_LONG)
+                    .setAction("Action", null)
+                    .show()
             }
         }
 
-        viewModel.error.observe(viewLifecycleOwner) {
-            binding.currentWeatherLayout.visibility = View.GONE
-            Snackbar.make(view, it?:"Error", Snackbar.LENGTH_LONG)
-                .setAction("Action", null)
-                .show()
+        viewModel.currentWeather.observe(viewLifecycleOwner) {
+            with(it) {
+                val iconId = WeatherIcon.getDrawableId(conditionIcon, isDay)
+                binding.temperature.setCompoundDrawablesWithIntrinsicBounds(iconId, 0, 0, 0)
+                binding.temperature.text = temperature
+                binding.conditionText.text = conditionText
+                binding.uv.text = uv
+                binding.windSpeed.text = windSpeed
+                binding.humidity.text = humidity
+                binding.time.text = currentTime
+                binding.locationName.text = locationName
+                binding.currentWeatherLayout.visibility = View.VISIBLE
+            }
         }
 
         return view
