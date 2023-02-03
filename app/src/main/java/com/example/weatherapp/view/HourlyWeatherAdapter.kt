@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.weatherapp.R
 import com.example.weatherapp.databinding.HourlyWeatherItemBinding
 import com.example.weatherapp.model.HourlyWeather
+import com.example.weatherapp.util.WeatherIcon
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 
@@ -54,7 +55,7 @@ class HourlyWeatherAdapter() : ListAdapter<HourlyWeather, HourlyWeatherAdapter.H
         fun bind(hourlyWeather: HourlyWeather) {
             with(binding) {
                 time.text = parseTime(hourlyWeather.time)
-                conditionIcon.setImageResource(WeatherIcon.getDrawable(hourlyWeather.conditionIcon))
+                conditionIcon.setImageResource(WeatherIcon.getDrawableId(hourlyWeather.conditionIcon))
                 temperature.text = getString(R.string.deg_celsius, decimal.format(hourlyWeather.temperature))
                 precipitation.text = getString(R.string.percent, decimal.format(hourlyWeather.precipitation))
                 windSpeed.text = getString(R.string.km_hour, decimal.format(hourlyWeather.windSpeed))

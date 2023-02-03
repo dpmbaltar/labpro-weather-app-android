@@ -1,7 +1,10 @@
 package com.example.weatherapp.model
 
+import com.google.gson.annotations.JsonAdapter
+import java.util.*
+
 data class CurrentWeather(
-    val time: String,
+    @field:JsonAdapter(JsonAdapters.DateTimeWithoutSecondsAdapter::class) val time: Date,
     val temperature: Double,
     val apparentTemperature: Double,
     val precipitation: Double,

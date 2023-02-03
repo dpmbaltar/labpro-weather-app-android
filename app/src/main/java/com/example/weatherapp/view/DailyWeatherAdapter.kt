@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.weatherapp.R
 import com.example.weatherapp.databinding.DailyWeatherItemBinding
 import com.example.weatherapp.model.DailyWeather
+import com.example.weatherapp.util.WeatherIcon
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 
@@ -63,7 +64,7 @@ class DailyWeatherAdapter(
                 temperatureMax.text = getString(R.string.deg_celsius, decimal.format(dailyWeather.temperatureMax))
                 temperatureMin.text = getString(R.string.deg_celsius, decimal.format(dailyWeather.temperatureMin))
                 conditionText.text = dailyWeather.conditionText
-                conditionIcon.setImageResource(WeatherIcon.getDrawable(dailyWeather.conditionIcon))
+                conditionIcon.setImageResource(WeatherIcon.getDrawableId(dailyWeather.conditionIcon))
             }
         }
 

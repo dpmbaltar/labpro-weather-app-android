@@ -1,21 +1,21 @@
-package com.example.weatherapp.view
+package com.example.weatherapp.util
 
 import com.example.weatherapp.R
 
 class WeatherIcon {
 
     companion object {
-        fun getDrawable(conditionIcon: Int, isDay: Boolean = true): Int {
+        fun getDrawableId(conditionIcon: Int, isDay: Boolean = true): Int {
             return if (isDay)
-                Day.getDrawable(conditionIcon)
+                Day.getDrawableId(conditionIcon)
             else
-                Night.getDrawable(conditionIcon)
+                Night.getDrawableId(conditionIcon)
         }
     }
 
     class Day {
         companion object {
-            fun getDrawable(conditionIcon: Int): Int {
+            fun getDrawableId(conditionIcon: Int): Int {
                 return when (conditionIcon) {
                     113 -> R.drawable.wi_day_113
                     116 -> R.drawable.wi_day_116
@@ -31,7 +31,7 @@ class WeatherIcon {
 
     class Night {
         companion object {
-            fun getDrawable(conditionIcon: Int): Int {
+            fun getDrawableId(conditionIcon: Int): Int {
                 return when (conditionIcon) {
                     113 -> R.drawable.wi_night_113
                     116 -> R.drawable.wi_night_116
