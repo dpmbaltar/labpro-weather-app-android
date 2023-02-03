@@ -2,7 +2,8 @@
   "comment": "Current weather sample data",
   "data": [
     {
-      "conditionText": "Soleado",
+      "locationName": "Neuquén, Neuquén",
+      "currentDate": "lunes, 28 agosto",
       "temperature": "36,4 °C",
       "apparentTemperature": "38,2 °C",
       "precipitation": "10 %",
@@ -11,7 +12,8 @@
       "windDirection": "90",
       "uv": 8,
       "isDay": true,
-      "weatherCode": 0
+      "conditionText": "Soleado",
+      "conditionIcon": 113
     }
   ]
 }
