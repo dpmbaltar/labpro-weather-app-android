@@ -113,6 +113,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:clipToPadding="false"
+                android:padding="10dp"
                 tools:itemCount="24"
                 tools:listitem="@layout/hourly_weather_item" />
 

@@ -71,7 +71,7 @@
                         android:id="@+id/condition_text"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:textSize="@dimen/text_size_big"
+                        android:textSize="@dimen/text_size_big_ish"
                         tools:text="@sample/current_weather.json/data/conditionText" />
 
                 </LinearLayout>
@@ -110,7 +110,7 @@
                             android:id="@+id/uv"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:textSize="@dimen/text_size_medium"
+                            android:textSize="@dimen/text_size_regular"
                             android:textAlignment="center"
                             tools:text="@sample/current_weather.json/data/uv" />
 
@@ -139,7 +139,7 @@
                             android:id="@+id/wind_speed"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:textSize="@dimen/text_size_medium"
+                            android:textSize="@dimen/text_size_regular"
                             android:textAlignment="center"
                             tools:text="@sample/current_weather.json/data/windSpeed" />
 
@@ -168,7 +168,7 @@
                             android:id="@+id/humidity"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:textSize="@dimen/text_size_medium"
+                            android:textSize="@dimen/text_size_regular"
                             android:textAlignment="center"
                             tools:text="@sample/current_weather.json/data/humidity" />
 

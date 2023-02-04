@@ -5,7 +5,6 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:padding="5dp"
     android:weightSum="5"
     android:gravity="center_vertical">
 
@@ -13,7 +12,7 @@
         android:id="@+id/time"
         android:layout_width="60dp"
         android:layout_height="wrap_content"
-        android:layout_margin="4dp"
+        android:layout_margin="5dp"
         android:textSize="@dimen/text_size_small"
         tools:text="@sample/hourly_weather.json/data/time" />
 
@@ -21,7 +20,7 @@
         android:id="@+id/condition_icon"
         android:layout_width="28dp"
         android:layout_height="28dp"
-        android:layout_margin="4dp"
+        android:layout_margin="5dp"
         tools:srcCompat="@drawable/wi_day_113" />
 
     <TextView
@@ -29,7 +28,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="2"
-        android:layout_margin="4dp"
+        android:layout_margin="5dp"
         android:textSize="@dimen/text_size_small"
         tools:text="@sample/hourly_weather.json/data/temperature" />
 
@@ -38,7 +37,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:layout_margin="4dp"
+        android:layout_margin="5dp"
         android:textSize="@dimen/text_size_small"
         tools:text="@sample/hourly_weather.json/data/precipitation" />
 
@@ -47,7 +46,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="2"
-        android:layout_margin="4dp"
+        android:layout_margin="5dp"
         android:textSize="@dimen/text_size_small"
         tools:text="@sample/hourly_weather.json/data/windSpeed" />
 
