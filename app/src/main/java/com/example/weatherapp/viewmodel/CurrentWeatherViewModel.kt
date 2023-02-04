@@ -98,7 +98,7 @@ class CurrentWeatherViewModel @Inject constructor(
         private const val PERCENT = "%"
 
         @SuppressLint("SimpleDateFormat")
-        private val dateFormat = SimpleDateFormat("EEEE, d MMMM")
+        private val dateFormat = SimpleDateFormat("EEEE, d MMM")
         private val decimalFormat = DecimalFormat("0.#")
     }
 }
