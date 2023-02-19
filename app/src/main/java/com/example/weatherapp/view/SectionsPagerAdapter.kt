@@ -21,8 +21,9 @@ class SectionsPagerAdapter(
         // getItem is called to instantiate the fragment for the given page.
         // Return a PlaceholderFragment (defined as a static inner class below).
         return when (position) {
-            0 -> return CurrentWeatherFragment.newInstance()
-            1 -> return DailyWeatherNavHostFragment.newInstance()
+            0 -> CurrentWeatherFragment.newInstance()
+            1 -> DailyWeatherNavHostFragment.newInstance()
+            2 -> HistoricalWeatherFragment.newInstance()
             else -> PlaceholderFragment.newInstance(position + 1)
         }
     }
