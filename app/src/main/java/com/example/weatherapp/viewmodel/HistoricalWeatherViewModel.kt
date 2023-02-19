@@ -6,7 +6,7 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.cachedIn
 import com.example.weatherapp.model.WeatherForecastRepository
-import com.example.weatherapp.view.HistoricalWeatherPagingSource
+import com.example.weatherapp.model.HistoricalWeatherPagingSource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 

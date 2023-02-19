@@ -1,9 +1,7 @@
-package com.example.weatherapp.view
+package com.example.weatherapp.model
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
-import com.example.weatherapp.model.DailyWeather
-import com.example.weatherapp.model.WeatherForecastRepository
 import java.util.Calendar
 
 class HistoricalWeatherPagingSource(
