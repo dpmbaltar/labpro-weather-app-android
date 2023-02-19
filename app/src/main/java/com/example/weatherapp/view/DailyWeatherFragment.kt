@@ -1,29 +1,47 @@
 package com.example.weatherapp.view
 
+import android.annotation.SuppressLint
+import android.app.Activity
+import android.location.Location
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.weatherapp.adapter.DailyWeatherAdapter
 import com.example.weatherapp.databinding.FragmentDailyWeatherBinding
 import com.example.weatherapp.viewmodel.DailyWeatherViewModel
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import java.util.*
 
 @AndroidEntryPoint
 class DailyWeatherFragment : Fragment() {
 
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
+    private var location: Location? = null
     private lateinit var viewModel: DailyWeatherViewModel
     private var _binding: FragmentDailyWeatherBinding? = null
     private val binding get() = _binding!!
 
+    @SuppressLint("MissingPermission")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewModel = ViewModelProvider(this)[DailyWeatherViewModel::class.java]
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(activity as Activity)
+        fusedLocationClient.lastLocation.addOnSuccessListener {
+            location = it?.apply {
+                lifecycleScope.launch {
+                    viewModel.loadDailyWeather(latitude, longitude)
+                }
+            }
+        }
     }
 
     override fun onCreateView(

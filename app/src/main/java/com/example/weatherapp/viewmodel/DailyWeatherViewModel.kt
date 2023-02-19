@@ -6,9 +6,6 @@ import com.example.weatherapp.model.DailyWeather
 import com.example.weatherapp.model.WeatherForecastRepository
 import com.example.weatherapp.model.WeatherLocation
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import java.io.IOException
 import javax.inject.Inject
 
@@ -21,16 +18,9 @@ class DailyWeatherViewModel @Inject constructor(
     val daily = MutableLiveData<List<DailyWeather>>()
     val error = MutableLiveData<String>()
 
-    init {
-        GlobalScope.launch(Dispatchers.IO) {
-            loadDailyWeather()
-        }
-    }
-
-    private suspend fun loadDailyWeather() {
+    suspend fun loadDailyWeather(latitude: Double, longitude: Double) {
         try {
-            // TODO: Get location from device
-            val dailyWeatherResponse = weatherForecastRepository.getDaily(-38.95, -68.07)
+            val dailyWeatherResponse = weatherForecastRepository.getDaily(latitude, longitude)
             if (dailyWeatherResponse.isSuccessful) {
                 dailyWeatherResponse.body()?.let {
                     location.postValue(it.location)
@@ -45,5 +35,4 @@ class DailyWeatherViewModel @Inject constructor(
             error.postValue(e.localizedMessage)
         }
     }
-
 }

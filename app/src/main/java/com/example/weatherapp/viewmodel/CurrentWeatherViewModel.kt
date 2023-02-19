@@ -19,25 +19,6 @@ class CurrentWeatherViewModel @Inject constructor(
     private val weatherForecastRepository: WeatherForecastRepository
 ) : ViewModel() {
 
-    data class CurrentWeatherUiState(
-        val isRefreshing: Boolean = false,
-        val isLoaded: Boolean = false,
-        val isFailed: Boolean = false,
-        val lastError: String = ""
-    )
-
-    data class CurrentWeatherItemUiState(
-        val locationName: String,
-        val currentTime: String,
-        val temperature: String,
-        val humidity: String,
-        val windSpeed: String,
-        val uv: String,
-        val isDay: Boolean,
-        val conditionText: String,
-        val conditionIcon: Int
-    )
-
     private val _uiState = MutableLiveData(CurrentWeatherUiState())
     val uiState: LiveData<CurrentWeatherUiState> get() = _uiState
 
@@ -58,20 +39,19 @@ class CurrentWeatherViewModel @Inject constructor(
         }
     }
 
-    suspend fun refresh() {
+    suspend fun refresh(latitude: Double, longitude: Double) {
         withContext(coroutineDispatcher) {
             _uiState.apply {
                 postValue(value!!.copy(isRefreshing = true))
-                fetchCurrentWeather()
+                fetchCurrentWeather(latitude, longitude)
                 postValue(value!!.copy(isRefreshing = false))
             }
         }
     }
 
-    private suspend fun fetchCurrentWeather() {
+    private suspend fun fetchCurrentWeather(latitude: Double, longitude: Double) {
         try {
-            // TODO: Get location from device
-            val response = weatherForecastRepository.getCurrent(-38.95, -68.07)
+            val response = weatherForecastRepository.getCurrent(latitude, longitude)
             if (response.isSuccessful) {
                 _currentWeather.postValue(response.body())
             } else {
@@ -102,3 +82,22 @@ class CurrentWeatherViewModel @Inject constructor(
         private val decimalFormat = DecimalFormat("0.#")
     }
 }
+
+data class CurrentWeatherUiState(
+    val isRefreshing: Boolean = false,
+    val isLoaded: Boolean = false,
+    val isFailed: Boolean = false,
+    val lastError: String = ""
+)
+
+data class CurrentWeatherItemUiState(
+    val locationName: String,
+    val currentTime: String,
+    val temperature: String,
+    val humidity: String,
+    val windSpeed: String,
+    val uv: String,
+    val isDay: Boolean,
+    val conditionText: String,
+    val conditionIcon: Int
+)

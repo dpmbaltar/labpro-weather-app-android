@@ -1,5 +1,8 @@
 package com.example.weatherapp.view
 
+import android.annotation.SuppressLint
+import android.app.Activity
+import android.location.Location
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -12,6 +15,8 @@ import androidx.lifecycle.map
 import com.example.weatherapp.databinding.FragmentCurrentWeatherBinding
 import com.example.weatherapp.util.WeatherIcon
 import com.example.weatherapp.viewmodel.CurrentWeatherViewModel
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -23,25 +28,37 @@ class CurrentWeatherFragment : Fragment() {
         fun newInstance() = CurrentWeatherFragment()
     }
 
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
+    private var location: Location? = null
     private lateinit var viewModel: CurrentWeatherViewModel
     private var _binding: FragmentCurrentWeatherBinding? = null
     private val binding get() = _binding!!
 
+    @SuppressLint("MissingPermission")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewModel = ViewModelProvider(this)[CurrentWeatherViewModel::class.java]
-        lifecycleScope.launch { viewModel.refresh() }
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(activity as Activity)
+        fusedLocationClient.lastLocation.addOnSuccessListener {
+            location = it?.apply {
+                lifecycleScope.launch {
+                    viewModel.refresh(latitude, longitude)
+                }
+            }
+        }
     }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         _binding = FragmentCurrentWeatherBinding.inflate(inflater, container, false)
         val view = binding.root
         val refreshView = binding.swipeRefresh.apply {
             setOnRefreshListener {
-                lifecycleScope.launch { viewModel.refresh() }
+                location?.apply {
+                    lifecycleScope.launch { viewModel.refresh(latitude, longitude) }
+                }
             }
         }
 

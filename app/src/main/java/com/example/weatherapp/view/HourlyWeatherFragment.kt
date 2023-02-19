@@ -21,11 +21,11 @@ import java.util.*
 class HourlyWeatherFragment : Fragment() {
 
     companion object {
-        var LATITUDE_NAME = "latitude"
-        val LONGITUDE_NAME = "longitude"
-        val DATE_NAME = "date"
-        val SUNRISE_NAME = "sunrise"
-        val SUNSET_NAME = "sunset"
+        const val LATITUDE_NAME = "latitude"
+        const val LONGITUDE_NAME = "longitude"
+        const val DATE_NAME = "date"
+        const val SUNRISE_NAME = "sunrise"
+        const val SUNSET_NAME = "sunset"
     }
 
     private lateinit var viewModel: HourlyWeatherViewModel
