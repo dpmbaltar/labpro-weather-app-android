@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.weatherapp.adapter.DailyWeatherAdapter
 import com.example.weatherapp.databinding.FragmentDailyWeatherBinding
 import com.example.weatherapp.viewmodel.DailyWeatherViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -29,7 +30,7 @@ class DailyWeatherFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         _binding = FragmentDailyWeatherBinding.inflate(inflater, container, false)
         val view = binding.root
 
@@ -37,7 +38,7 @@ class DailyWeatherFragment : Fragment() {
             viewModel.location.value?.let { location ->
                 viewModel.daily.value?.let {
                     val daily = it[position]
-                    val date = daily.time ?: Calendar.getInstance().toString()
+                    val date = daily.time
                     val action = DailyWeatherFragmentDirections
                         .actionDailyWeatherFragmentToHourlyWeatherFragment(
                             latitude = location.latitude.toFloat(),

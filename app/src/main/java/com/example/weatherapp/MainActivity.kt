@@ -4,7 +4,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.viewpager.widget.ViewPager
 import com.example.weatherapp.databinding.ActivityMainBinding
-import com.example.weatherapp.view.SectionsPagerAdapter
+import com.example.weatherapp.adapter.SectionsPagerAdapter
 import com.google.android.material.tabs.TabLayout
 import dagger.hilt.android.AndroidEntryPoint
 

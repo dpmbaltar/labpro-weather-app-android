@@ -1,10 +1,11 @@
-package com.example.weatherapp.view
+package com.example.weatherapp.adapter
 
 import android.content.Context
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
 import com.example.weatherapp.R
+import com.example.weatherapp.view.*
 
 private val TAB_TITLES = arrayOf(
     R.string.current,
@@ -18,13 +19,11 @@ class SectionsPagerAdapter(
 ) : FragmentPagerAdapter(fm) {
 
     override fun getItem(position: Int): Fragment {
-        // getItem is called to instantiate the fragment for the given page.
-        // Return a PlaceholderFragment (defined as a static inner class below).
         return when (position) {
             0 -> CurrentWeatherFragment.newInstance()
             1 -> DailyWeatherNavHostFragment.newInstance()
             2 -> HistoricalWeatherFragment.newInstance()
-            else -> PlaceholderFragment.newInstance(position + 1)
+            else -> PlaceholderFragment.newInstance()
         }
     }
 
@@ -32,7 +31,5 @@ class SectionsPagerAdapter(
         return context.resources.getString(TAB_TITLES[position])
     }
 
-    override fun getCount(): Int {
-        return 3
-    }
+    override fun getCount() = 3
 }

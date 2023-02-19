@@ -10,9 +10,8 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.weatherapp.adapter.HourlyWeatherAdapter
 import com.example.weatherapp.databinding.FragmentHourlyWeatherBinding
-import com.example.weatherapp.model.WeatherLocation
-import com.example.weatherapp.viewmodel.CurrentWeatherViewModel
 import com.example.weatherapp.viewmodel.HourlyWeatherViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import java.text.SimpleDateFormat
@@ -48,7 +47,7 @@ class HourlyWeatherFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         _binding = FragmentHourlyWeatherBinding.inflate(inflater, container, false)
         val view = binding.root
         val hourlyWeatherAdapter = HourlyWeatherAdapter()

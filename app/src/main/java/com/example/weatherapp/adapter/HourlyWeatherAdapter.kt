@@ -1,4 +1,4 @@
-package com.example.weatherapp.view
+package com.example.weatherapp.adapter
 
 import android.util.Log
 import android.view.LayoutInflater
@@ -13,7 +13,9 @@ import com.example.weatherapp.util.WeatherIcon
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 
-class HourlyWeatherAdapter() : ListAdapter<HourlyWeather, HourlyWeatherAdapter.HourlyWeatherViewHolder>(DiffCallback) {
+class HourlyWeatherAdapter() : ListAdapter<HourlyWeather, HourlyWeatherAdapter.HourlyWeatherViewHolder>(
+    DiffCallback
+) {
 
     companion object {
         private val DiffCallback = object : DiffUtil.ItemCallback<HourlyWeather>() {

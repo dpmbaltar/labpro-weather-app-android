@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.weatherapp.adapter.HistoricalWeatherPagingDataAdapter
 import com.example.weatherapp.databinding.FragmentHistoricalWeatherBinding
 import com.example.weatherapp.viewmodel.HistoricalWeatherViewModel
 import dagger.hilt.android.AndroidEntryPoint
