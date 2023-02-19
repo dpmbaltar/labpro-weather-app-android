@@ -8,15 +8,15 @@ import java.util.*
 import javax.inject.Inject
 
 class WeatherForecastRepository @Inject constructor(
-    private val weatherForecastService: WeatherForecastService
+    private val weatherService: WeatherForecastService
 ) {
 
     suspend fun getCurrent(latitude: Double, longitude: Double): Response<CurrentWeatherResponse> {
-        return weatherForecastService.current(latitude, longitude)
+        return weatherService.current(latitude, longitude)
     }
 
     suspend fun getDaily(latitude: Double, longitude: Double): Response<DailyWeatherResponse> {
-        return weatherForecastService.daily(latitude, longitude)
+        return weatherService.daily(latitude, longitude)
     }
 
     suspend fun getHourly(
@@ -24,7 +24,7 @@ class WeatherForecastRepository @Inject constructor(
         longitude: Double,
         date: Calendar
     ): Response<HourlyWeatherResponse> {
-        return weatherForecastService.hourly(
+        return weatherService.hourly(
             date.get(Calendar.YEAR),
             date.get(Calendar.MONTH) + 1,
             date.get(Calendar.DAY_OF_MONTH),
@@ -37,9 +37,9 @@ class WeatherForecastRepository @Inject constructor(
         latitude: Double,
         longitude: Double,
         date: Date,
-        days: Int
+        days: Int = -7
     ): Response<DailyWeatherResponse> {
-        return weatherForecastService.historical(
+        return weatherService.historical(
             latitude,
             longitude,
             dateFormat.format(date),

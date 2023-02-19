@@ -43,7 +43,7 @@ class HistoricalWeatherFragment : Fragment() {
         recyclerView.adapter = pagingAdapter
 
         lifecycleScope.launch {
-            viewModel.flow.collectLatest { pagingData ->
+            viewModel.weatherFlow.collectLatest { pagingData ->
                 pagingAdapter.submitData(pagingData)
             }
         }
