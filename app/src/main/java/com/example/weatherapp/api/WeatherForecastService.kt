@@ -36,6 +36,14 @@ interface WeatherForecastService {
         @Query("longitude") longitude: Double,
     ): Response<HourlyWeatherResponse>
 
+    @GET("/api/weather/historical")
+    suspend fun historical(
+        @Query("latitude") latitude: Double,
+        @Query("longitude") longitude: Double,
+        @Query("date") date: String,
+        @Query("days") days: Int,
+    ): Response<DailyWeatherResponse>
+
     companion object {
         private const val BASE_URL = "http://192.168.0.239:9000/"
 
