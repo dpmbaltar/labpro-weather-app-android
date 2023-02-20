@@ -1,12 +1,15 @@
 package com.example.weatherapp.view
 
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.paging.LoadState
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.weatherapp.adapter.HistoricalWeatherPagingDataAdapter
 import com.example.weatherapp.databinding.FragmentHistoricalWeatherBinding
@@ -19,6 +22,9 @@ import kotlinx.coroutines.launch
 class HistoricalWeatherFragment : Fragment() {
 
     companion object {
+        private var retries = 0
+        private const val LOAD_MAX_RETRIES = 3
+        private const val LOAD_TIMEOUT = 500L
         fun newInstance() = HistoricalWeatherFragment()
     }
 
@@ -43,8 +49,19 @@ class HistoricalWeatherFragment : Fragment() {
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
         recyclerView.adapter = pagingAdapter
 
+        pagingAdapter.addLoadStateListener {
+            if (it.source.refresh is LoadState.Error) {
+                if (retries < LOAD_MAX_RETRIES) {
+                    Handler(Looper.getMainLooper()).postDelayed({
+                        pagingAdapter.retry()
+                    }, LOAD_TIMEOUT)
+                    retries++
+                }
+            }
+        }
+
         lifecycleScope.launch {
-            viewModel.weatherFlow.collectLatest { pagingData ->
+            viewModel.daily.collectLatest { pagingData ->
                 pagingAdapter.submitData(pagingData)
             }
         }

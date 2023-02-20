@@ -1,21 +1,39 @@
 package com.example.weatherapp.model
 
+import android.annotation.SuppressLint
+import android.location.Location
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
-import java.util.Calendar
+import com.google.android.gms.location.FusedLocationProviderClient
+import java.util.*
+import javax.inject.Inject
 
-class HistoricalWeatherPagingSource(
-    private val weatherRepository: WeatherForecastRepository
+const val PAGE_SIZE = 7
+
+@SuppressLint("MissingPermission")
+class HistoricalWeatherPagingSource @Inject constructor(
+    private val weatherRepository: WeatherForecastRepository,
+    locationProvider: FusedLocationProviderClient
 ) : PagingSource<Int, DailyWeather>() {
+
+    private val today: Calendar = Calendar.getInstance()
+    private var _location: Location? = null
+    private val location get() = _location!!
+
+    init {
+        locationProvider.lastLocation.addOnSuccessListener { _location = it }
+    }
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, DailyWeather> {
         return try {
             val nextPage = params.key ?: 1
-            val latitude = -38.95 // TODO: get user location
-            val longitude = -68.07
-            val days = -7
-            val date = Calendar.getInstance().apply { add(Calendar.DATE, days.times(nextPage)) }
-            val response = weatherRepository.getHistorical(latitude, longitude, date.time, days)
+            val date = today.apply { add(Calendar.DATE, -PAGE_SIZE.times(nextPage)) }
+            val response = weatherRepository.getHistorical(
+                location.latitude,
+                location.longitude,
+                date.time,
+                -PAGE_SIZE
+            )
 
             LoadResult.Page(
                 data = response.body()!!.daily,
