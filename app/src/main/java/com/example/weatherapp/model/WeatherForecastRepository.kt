@@ -8,7 +8,8 @@ import java.util.*
 import javax.inject.Inject
 
 class WeatherForecastRepository @Inject constructor(
-    private val weatherService: WeatherForecastService
+    private val weatherService: WeatherForecastService,
+    private val weatherLocalDataSource: WeatherForecastLocalDataSource
 ) {
 
     suspend fun getCurrent(latitude: Double, longitude: Double): Response<CurrentWeatherResponse> {
@@ -50,5 +51,19 @@ class WeatherForecastRepository @Inject constructor(
     companion object {
         @SuppressLint("SimpleDateFormat")
         private val dateFormat = SimpleDateFormat("yyyy-MM-dd")
+
+        @Volatile
+        private var instance: WeatherForecastRepository? = null
+
+        fun getInstance(
+            weatherService: WeatherForecastService,
+            weatherLocalDataSource: WeatherForecastLocalDataSource
+        ) =
+            instance ?: synchronized(this) {
+                instance ?: WeatherForecastRepository(
+                    weatherService,
+                    weatherLocalDataSource
+                ).also { instance = it }
+            }
     }
 }

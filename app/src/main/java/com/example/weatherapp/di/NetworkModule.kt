@@ -13,7 +13,5 @@ class NetworkModule {
 
     @Singleton
     @Provides
-    fun providesWeatherForecastService(): WeatherForecastService {
-        return WeatherForecastService.create()
-    }
+    fun providesWeatherForecastService(): WeatherForecastService = WeatherForecastService.create()
 }
