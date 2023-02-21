@@ -22,15 +22,15 @@ import kotlinx.coroutines.launch
 class HistoricalWeatherFragment : Fragment() {
 
     companion object {
-        private var retries = 0
         private const val LOAD_MAX_RETRIES = 3
-        private const val LOAD_TIMEOUT = 500L
+        private const val LOAD_TIMEOUT = 200L
         fun newInstance() = HistoricalWeatherFragment()
     }
 
     private lateinit var viewModel: HistoricalWeatherViewModel
     private var _binding: FragmentHistoricalWeatherBinding? = null
     private val binding get() = _binding!!
+    private var retries = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,18 +45,32 @@ class HistoricalWeatherFragment : Fragment() {
         _binding = FragmentHistoricalWeatherBinding.inflate(inflater, container, false)
         val view = binding.root
         val pagingAdapter = HistoricalWeatherPagingDataAdapter()
+        val refreshView = binding.swipeRefresh.apply {
+            setOnRefreshListener {
+                retries = 0
+                pagingAdapter.refresh()
+            }
+        }
+
         val recyclerView = binding.historicalWeather
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
         recyclerView.adapter = pagingAdapter
 
         pagingAdapter.addLoadStateListener {
-            if (it.source.refresh is LoadState.Error) {
-                if (retries < LOAD_MAX_RETRIES) {
-                    Handler(Looper.getMainLooper()).postDelayed({
-                        pagingAdapter.retry()
-                    }, LOAD_TIMEOUT)
-                    retries++
+            when (it.source.refresh) {
+                is LoadState.Error -> {
+                    if (retries < LOAD_MAX_RETRIES) {
+                        Handler(Looper.getMainLooper()).postDelayed({
+                            pagingAdapter.retry()
+                        }, LOAD_TIMEOUT)
+                        retries++
+                    } else {
+                        refreshView.isRefreshing = false
+                    }
                 }
+                is LoadState.Loading -> refreshView.isRefreshing = true
+                is LoadState.NotLoading -> refreshView.isRefreshing = false
+                else -> refreshView.isRefreshing = false
             }
         }
 
