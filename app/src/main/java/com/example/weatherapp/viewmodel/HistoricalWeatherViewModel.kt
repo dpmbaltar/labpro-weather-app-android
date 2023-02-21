@@ -7,15 +7,18 @@ import androidx.paging.PagingConfig
 import androidx.paging.cachedIn
 import com.example.weatherapp.model.HistoricalWeatherPagingSource
 import com.example.weatherapp.model.PAGE_SIZE
+import com.example.weatherapp.model.WeatherForecastRepository
+import com.google.android.gms.location.FusedLocationProviderClient
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
 @HiltViewModel
 class HistoricalWeatherViewModel @Inject constructor(
-    private val pagingSource: HistoricalWeatherPagingSource
+    private val weatherRepository: WeatherForecastRepository,
+    private val locationProviderClient: FusedLocationProviderClient
 ) : ViewModel() {
 
     val daily = Pager(PagingConfig(pageSize = PAGE_SIZE)) {
-        pagingSource
+        HistoricalWeatherPagingSource(weatherRepository, locationProviderClient)
     }.flow.cachedIn(viewModelScope)
 }
