@@ -17,4 +17,10 @@ class Converters {
     @TypeConverter
     fun timestampToCalendar(value: Long): Calendar =
         Calendar.getInstance().apply { timeInMillis = value }
+
+    @TypeConverter
+    fun doubleToString(value: Double): String = String.format(Locale.US, "%.2f", value)
+
+    @TypeConverter
+    fun stringToDouble(value: String): Double = value.toDouble()
 }
