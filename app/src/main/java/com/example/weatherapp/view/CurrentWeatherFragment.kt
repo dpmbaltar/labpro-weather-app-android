@@ -27,7 +27,6 @@ class CurrentWeatherFragment : Fragment() {
     private var _binding: FragmentCurrentWeatherBinding? = null
     private val binding get() = _binding!!
 
-    @SuppressLint("MissingPermission")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewModel = ViewModelProvider(this)[CurrentWeatherViewModel::class.java]
@@ -39,11 +38,12 @@ class CurrentWeatherFragment : Fragment() {
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentCurrentWeatherBinding.inflate(inflater, container, false)
-        val view = binding.root
+
         refreshView = binding.swipeRefresh.apply {
             setOnRefreshListener {
                 lifecycleScope.launch { viewModel.refresh() }
@@ -51,48 +51,16 @@ class CurrentWeatherFragment : Fragment() {
         }
 
         lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.uiState.collect { uiState ->
-                    when (uiState) {
-                        is UiState.Loading -> showLoading()
-                        is UiState.Success -> showCurrentWeather(uiState.data)
-                        is UiState.Error -> showError(uiState.throwable)
-                    }
+            viewModel.uiState.collect { uiState ->
+                when (uiState) {
+                    is UiState.Loading -> showLoading()
+                    is UiState.Success -> showCurrentWeather(uiState.data)
+                    is UiState.Error -> showError(uiState.throwable)
                 }
             }
         }
 
-        /*viewModel.uiState.map {
-            it.isRefreshing
-        }.distinctUntilChanged().observe(viewLifecycleOwner) {
-            refreshView.isRefreshing = it
-        }
-
-        viewModel.uiState.observe(viewLifecycleOwner) {
-            if (it.isError) {
-                binding.currentWeatherLayout.visibility = View.GONE
-                Snackbar.make(view, it.lastError, Snackbar.LENGTH_LONG)
-                    .setAction("Action", null)
-                    .show()
-            }
-        }
-
-        viewModel.currentWeather.observe(viewLifecycleOwner) {
-            with(it) {
-                val iconId = WeatherIcon.getDrawableId(conditionIcon, isDay)
-                binding.temperature.setCompoundDrawablesWithIntrinsicBounds(iconId, 0, 0, 0)
-                binding.temperature.text = temperature
-                binding.conditionText.text = conditionText
-                binding.uv.text = uv
-                binding.windSpeed.text = windSpeed
-                binding.humidity.text = humidity
-                binding.time.text = currentTime
-                binding.locationName.text = locationName
-                binding.currentWeatherLayout.visibility = View.VISIBLE
-            }
-        }*/
-
-        return view
+        return binding.root
     }
 
     private fun showLoading(isRefreshing: Boolean = true) {
@@ -100,7 +68,7 @@ class CurrentWeatherFragment : Fragment() {
     }
 
     private fun showCurrentWeather(data: CurrentWeatherResponse) {
-        with (data) {
+        with(data) {
             val locationName = "${location.name}, ${location.region}"
             val iconId = WeatherIcon.getDrawableId(current.conditionIcon, current.isDay)
             binding.temperature.setCompoundDrawablesWithIntrinsicBounds(iconId, 0, 0, 0)
