@@ -10,6 +10,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.CoroutineDispatcher
 import javax.inject.Singleton
 
 @Module
@@ -27,9 +28,14 @@ class AppModule {
     @Provides
     fun providesWeatherForecastLocalDataSource(
         locationDao: WeatherLocationDao,
-        currentWeatherDao: CurrentWeatherDao
+        currentWeatherDao: CurrentWeatherDao,
+        @IoDispatcher coroutineDispatcher: CoroutineDispatcher
     ): WeatherForecastLocalDataSource =
-        WeatherForecastLocalDataSource.getInstance(locationDao, currentWeatherDao)
+        WeatherForecastLocalDataSource.getInstance(
+            locationDao,
+            currentWeatherDao,
+            coroutineDispatcher
+        )
 
     @Singleton
     @Provides
