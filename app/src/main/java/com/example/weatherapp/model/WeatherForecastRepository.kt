@@ -1,16 +1,38 @@
 package com.example.weatherapp.model
 
 import android.annotation.SuppressLint
+import android.location.Location
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.asFlow
 import com.example.weatherapp.api.WeatherForecastService
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.tasks.Tasks
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.flow
 import retrofit2.Response
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
+import javax.inject.Singleton
 
+@Singleton
+@SuppressLint("MissingPermission")
 class WeatherForecastRepository @Inject constructor(
     private val weatherService: WeatherForecastService,
-    private val weatherLocalDataSource: WeatherForecastLocalDataSource
+    private val locationProviderClient: FusedLocationProviderClient,
+    private val weatherLocalDataSource: WeatherForecastLocalDataSource,
+    private val weatherRemoteDataSource: WeatherForecastRemoteDataSource
 ) {
+
+    suspend fun getCurrentWeather(
+        latitude: Double,
+        longitude: Double
+    ): Flow<CurrentWeatherResponse> = flow {
+        emit(weatherRemoteDataSource.fetchCurrentWeather(latitude, longitude))
+    }
 
     suspend fun getCurrent(latitude: Double, longitude: Double): Response<CurrentWeatherResponse> {
         return weatherService.current(latitude, longitude)
@@ -57,12 +79,16 @@ class WeatherForecastRepository @Inject constructor(
 
         fun getInstance(
             weatherService: WeatherForecastService,
-            weatherLocalDataSource: WeatherForecastLocalDataSource
+            locationProviderClient: FusedLocationProviderClient,
+            weatherLocalDataSource: WeatherForecastLocalDataSource,
+            weatherRemoteDataSource: WeatherForecastRemoteDataSource
         ) =
             instance ?: synchronized(this) {
                 instance ?: WeatherForecastRepository(
                     weatherService,
-                    weatherLocalDataSource
+                    locationProviderClient,
+                    weatherLocalDataSource,
+                    weatherRemoteDataSource
                 ).also { instance = it }
             }
     }

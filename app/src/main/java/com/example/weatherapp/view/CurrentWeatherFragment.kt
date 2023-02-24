@@ -1,35 +1,28 @@
 package com.example.weatherapp.view
 
 import android.annotation.SuppressLint
-import android.app.Activity
-import android.location.Location
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.distinctUntilChanged
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.map
+import androidx.lifecycle.*
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.example.weatherapp.databinding.FragmentCurrentWeatherBinding
+import com.example.weatherapp.model.CurrentWeatherResponse
 import com.example.weatherapp.util.WeatherIcon
 import com.example.weatherapp.viewmodel.CurrentWeatherViewModel
-import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationServices
+import com.example.weatherapp.viewmodel.CurrentWeatherViewModel.UiState
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import java.text.DecimalFormat
+import java.text.SimpleDateFormat
 
 @AndroidEntryPoint
 class CurrentWeatherFragment : Fragment() {
 
-    companion object {
-        fun newInstance() = CurrentWeatherFragment()
-    }
-
-    private lateinit var fusedLocationClient: FusedLocationProviderClient
-    private var location: Location? = null
+    private lateinit var refreshView: SwipeRefreshLayout
     private lateinit var viewModel: CurrentWeatherViewModel
     private var _binding: FragmentCurrentWeatherBinding? = null
     private val binding get() = _binding!!
@@ -38,12 +31,9 @@ class CurrentWeatherFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewModel = ViewModelProvider(this)[CurrentWeatherViewModel::class.java]
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(activity as Activity)
-        fusedLocationClient.lastLocation.addOnSuccessListener {
-            location = it?.apply {
-                lifecycleScope.launch {
-                    viewModel.refresh(latitude, longitude)
-                }
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.refresh()
             }
         }
     }
@@ -54,22 +44,32 @@ class CurrentWeatherFragment : Fragment() {
     ): View {
         _binding = FragmentCurrentWeatherBinding.inflate(inflater, container, false)
         val view = binding.root
-        val refreshView = binding.swipeRefresh.apply {
+        refreshView = binding.swipeRefresh.apply {
             setOnRefreshListener {
-                location?.apply {
-                    lifecycleScope.launch { viewModel.refresh(latitude, longitude) }
+                lifecycleScope.launch { viewModel.refresh() }
+            }
+        }
+
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.uiState.collect { uiState ->
+                    when (uiState) {
+                        is UiState.Loading -> showLoading()
+                        is UiState.Success -> showCurrentWeather(uiState.data)
+                        is UiState.Error -> showError(uiState.throwable)
+                    }
                 }
             }
         }
 
-        viewModel.uiState.map {
+        /*viewModel.uiState.map {
             it.isRefreshing
         }.distinctUntilChanged().observe(viewLifecycleOwner) {
             refreshView.isRefreshing = it
         }
 
         viewModel.uiState.observe(viewLifecycleOwner) {
-            if (it.isFailed) {
+            if (it.isError) {
                 binding.currentWeatherLayout.visibility = View.GONE
                 Snackbar.make(view, it.lastError, Snackbar.LENGTH_LONG)
                     .setAction("Action", null)
@@ -90,8 +90,51 @@ class CurrentWeatherFragment : Fragment() {
                 binding.locationName.text = locationName
                 binding.currentWeatherLayout.visibility = View.VISIBLE
             }
-        }
+        }*/
 
         return view
+    }
+
+    private fun showLoading(isRefreshing: Boolean = true) {
+        refreshView.isRefreshing = isRefreshing
+    }
+
+    private fun showCurrentWeather(data: CurrentWeatherResponse) {
+        with (data) {
+            val locationName = "${location.name}, ${location.region}"
+            val iconId = WeatherIcon.getDrawableId(current.conditionIcon, current.isDay)
+            binding.temperature.setCompoundDrawablesWithIntrinsicBounds(iconId, 0, 0, 0)
+            binding.temperature.text = decimalFormat.format(current.temperature).plus(DEGREE_CELSIUS)
+            binding.conditionText.text = current.conditionText
+            binding.uv.text = decimalFormat.format(current.uv)
+            binding.windSpeed.text = decimalFormat.format(current.windSpeed).plus(KM_H)
+            binding.humidity.text = decimalFormat.format(current.humidity).plus(PERCENT)
+            binding.time.text = dateFormat.format(current.time)
+            binding.locationName.text = locationName
+            binding.currentWeatherLayout.visibility = View.VISIBLE
+        }.also {
+            showLoading(false)
+        }
+    }
+
+    private fun showError(throwable: Throwable?) {
+        binding.currentWeatherLayout.visibility = View.GONE
+        Snackbar.make(binding.root, throwable?.localizedMessage ?: "Error", Snackbar.LENGTH_LONG)
+            .setAction("Action", null)
+            .show()
+            .also { showLoading(false) }
+    }
+
+    companion object {
+
+        private const val DEGREE_CELSIUS = "°C"
+        private const val KM_H = " km/h"
+        private const val PERCENT = "%"
+
+        @SuppressLint("SimpleDateFormat")
+        private val dateFormat = SimpleDateFormat("EEEE, d MMM")
+        private val decimalFormat = DecimalFormat("0.#")
+
+        fun newInstance() = CurrentWeatherFragment()
     }
 }
