@@ -1,16 +1,11 @@
 package com.example.weatherapp.model
 
 import android.annotation.SuppressLint
-import android.location.Location
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.asFlow
+import android.util.Log
 import com.example.weatherapp.api.WeatherForecastService
 import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.tasks.Tasks
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.flow
 import retrofit2.Response
 import java.text.SimpleDateFormat
@@ -31,7 +26,16 @@ class WeatherForecastRepository @Inject constructor(
         latitude: Double,
         longitude: Double
     ): Flow<CurrentWeatherResponse> = flow {
-        emit(weatherRemoteDataSource.fetchCurrentWeather(latitude, longitude))
+        var weather = weatherLocalDataSource.getCurrentWeather(latitude, longitude)
+        if (weather == null || weather.current.isOld()) {
+            if (weather != null) {
+                Log.d("WeatherForecastRepository.getCurrentWeather", weather.current.isOld().toString())
+            }
+            weather = weatherRemoteDataSource.fetchCurrentWeather(latitude, longitude)
+            weatherLocalDataSource.insertCurrentWeather(weather)
+        }
+
+        emit(weather)
     }
 
     suspend fun getCurrent(latitude: Double, longitude: Double): Response<CurrentWeatherResponse> {

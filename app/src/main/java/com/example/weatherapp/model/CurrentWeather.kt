@@ -19,6 +19,7 @@ import java.util.Calendar.HOUR
 data class CurrentWeather(
     @field:JsonAdapter(JsonAdapters.DateTimeWithoutSecondsAdapter::class)
     @PrimaryKey
+    @ColumnInfo(name = "time")
     val time: Date,
     val temperature: Double,
     val apparentTemperature: Double,
@@ -29,9 +30,11 @@ data class CurrentWeather(
     val uv: Int,
     val isDay: Boolean,
     val conditionText: String,
-    val conditionIcon: Int,
-    @ColumnInfo(name = "location_id") val locationId: Long,
+    val conditionIcon: Int
 ) {
+
+    @ColumnInfo(name = "location_id")
+    var locationId: String? = null
 
     fun isOld() = Calendar.getInstance().apply { add(HOUR, -1) }.time > time
 }

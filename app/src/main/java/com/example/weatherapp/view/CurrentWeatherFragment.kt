@@ -2,6 +2,7 @@ package com.example.weatherapp.view
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -86,6 +87,7 @@ class CurrentWeatherFragment : Fragment() {
     }
 
     private fun showError(throwable: Throwable?) {
+        Log.d(null, throwable?.localizedMessage ?: "Error", throwable)
         binding.currentWeatherLayout.visibility = View.GONE
         Snackbar.make(binding.root, throwable?.localizedMessage ?: "Error", Snackbar.LENGTH_LONG)
             .setAction("Action", null)

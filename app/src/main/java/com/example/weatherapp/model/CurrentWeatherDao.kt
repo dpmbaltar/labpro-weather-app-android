@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.Flow
 interface CurrentWeatherDao {
 
     @Query("SELECT * FROM current_weather WHERE location_id = :locationId ORDER BY time DESC LIMIT 1")
-    fun getCurrentWeather(locationId: Long): Flow<CurrentWeather>
+    fun getCurrentWeather(locationId: String): CurrentWeather?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(currentWeather: CurrentWeather)
