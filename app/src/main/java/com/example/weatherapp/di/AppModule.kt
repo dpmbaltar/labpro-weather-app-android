@@ -2,9 +2,7 @@ package com.example.weatherapp.di
 
 import android.content.Context
 import com.example.weatherapp.api.WeatherForecastService
-import com.example.weatherapp.model.WeatherDatabase
-import com.example.weatherapp.model.WeatherForecastLocalDataSource
-import com.example.weatherapp.model.WeatherForecastRepository
+import com.example.weatherapp.model.*
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import dagger.Module
@@ -28,15 +26,30 @@ class AppModule {
     @Singleton
     @Provides
     fun providesWeatherForecastLocalDataSource(
-        weatherDatabase: WeatherDatabase
+        locationDao: WeatherLocationDao,
+        currentWeatherDao: CurrentWeatherDao
     ): WeatherForecastLocalDataSource =
-        WeatherForecastLocalDataSource.getInstance(weatherDatabase)
+        WeatherForecastLocalDataSource.getInstance(locationDao, currentWeatherDao)
+
+    @Singleton
+    @Provides
+    fun providesWeatherForecastRemoteDataSource(
+        weatherService: WeatherForecastService
+    ): WeatherForecastRemoteDataSource =
+        WeatherForecastRemoteDataSource.getInstance(weatherService)
 
     @Singleton
     @Provides
     fun providesWeatherForecastRepository(
         weatherService: WeatherForecastService,
-        weatherLocalDataSource: WeatherForecastLocalDataSource
+        locationProviderClient: FusedLocationProviderClient,
+        weatherLocalDataSource: WeatherForecastLocalDataSource,
+        weatherRemoteDataSource: WeatherForecastRemoteDataSource
     ): WeatherForecastRepository =
-        WeatherForecastRepository.getInstance(weatherService, weatherLocalDataSource)
+        WeatherForecastRepository.getInstance(
+            weatherService,
+            locationProviderClient,
+            weatherLocalDataSource,
+            weatherRemoteDataSource
+        )
 }
