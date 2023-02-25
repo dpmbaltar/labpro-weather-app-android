@@ -1,9 +1,7 @@
 package com.example.weatherapp.model
 
+import android.util.Log
 import com.example.weatherapp.api.WeatherForecastService
-import com.google.android.gms.location.FusedLocationProviderClient
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
 import java.io.IOException
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -33,7 +31,29 @@ class WeatherForecastRemoteDataSource @Inject constructor(
         }
     }
 
+    suspend fun fetchDailyWeather(
+        latitude: Double,
+        longitude: Double
+    ): DailyWeatherResponse {
+        return try {
+            weatherService.daily(latitude, longitude).let { it ->
+                if (it.isSuccessful) {
+                    it.body()!!
+                } else {
+                    it.errorBody().let { body ->
+                        Log.d(TAG, body.toString())
+                        throw Exception("Error ${it.code()}")
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            throw Exception(e.localizedMessage, e)
+        }
+    }
+
     companion object {
+
+        private val TAG = WeatherForecastRemoteDataSource::class.java.simpleName
 
         @Volatile
         private var instance: WeatherForecastRemoteDataSource? = null

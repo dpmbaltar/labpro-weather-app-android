@@ -38,6 +38,15 @@ class WeatherForecastRepository @Inject constructor(
         }
     }
 
+    suspend fun getDailyWeather(
+        latitude: Double,
+        longitude: Double
+    ): Flow<DailyWeatherResponse> = flow {
+        remoteWeather.fetchDailyWeather(latitude, longitude).let {
+            emit(it)
+        }
+    }
+
     suspend fun getCurrent(latitude: Double, longitude: Double): Response<CurrentWeatherResponse> {
         return weatherService.current(latitude, longitude)
     }
