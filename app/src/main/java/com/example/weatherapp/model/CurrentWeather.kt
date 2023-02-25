@@ -30,11 +30,10 @@ data class CurrentWeather(
     val uv: Int,
     val isDay: Boolean,
     val conditionText: String,
-    val conditionIcon: Int
-) {
-
+    val conditionIcon: Int,
     @ColumnInfo(name = "location_id")
-    var locationId: String? = null
+    val locationId: String? = null
+) {
 
     fun isOld() = Calendar.getInstance().apply { add(HOUR, -1) }.time > time
 }

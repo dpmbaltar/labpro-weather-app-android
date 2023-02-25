@@ -23,6 +23,7 @@ class CurrentWeatherViewModel @Inject constructor(
     sealed interface UiState {
 
         object Loading : UiState
+
         data class Success(
             val data: CurrentWeatherResponse
         ) : UiState

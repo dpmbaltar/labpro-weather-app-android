@@ -1,10 +1,8 @@
 package com.example.weatherapp.model
 
-import android.util.Log
 import com.example.weatherapp.di.IoDispatcher
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
-import java.util.*
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -16,34 +14,32 @@ class WeatherForecastLocalDataSource @Inject constructor(
 ) {
 
     // TODO: local data source
-    suspend fun getCurrentWeather(latitude: Double, longitude: Double): CurrentWeatherResponse? {
-        return withContext(coroutineDispatcher) {
-            try {
-                val id = WeatherLocation.buildId(latitude, longitude)
-                locationDao.getWeatherLocation(id)?.let { location ->
-                    Log.d("getCurrentWeather", location.toString())
-                    currentWeatherDao.getCurrentWeather(location.id)?.let { current ->
-                        CurrentWeatherResponse(location, current)
-                    }
-                }
-            } catch (e: Exception) {
-                Log.d("getCurrentWeather", e.localizedMessage, e)
-                null
-            }
-        }
-    }
-
-    suspend fun insertCurrentWeather(currentWeatherResponse: CurrentWeatherResponse) {
+    suspend fun getWeatherLocation(latitude: Double, longitude: Double): WeatherLocation? =
         withContext(coroutineDispatcher) {
-            with (currentWeatherResponse.location) {
-                locationDao.insert(copy(id = locationId())).let {
+            locationDao.getWeatherLocation(WeatherLocation.buildId(latitude, longitude))
+        }
+
+    suspend fun getCurrentWeather(latitude: Double, longitude: Double): CurrentWeather? =
+        withContext(coroutineDispatcher) {
+            currentWeatherDao.getCurrentWeather(WeatherLocation.buildId(latitude, longitude))
+        }
+
+    suspend fun getCurrentWeather(weatherLocation: WeatherLocation): CurrentWeather? =
+        withContext(coroutineDispatcher) {
+            currentWeatherDao.getCurrentWeather(weatherLocation.locationId())
+        }
+
+    suspend fun insertCurrentWeather(currentWeatherResponse: CurrentWeatherResponse) =
+        withContext(coroutineDispatcher) {
+            with(currentWeatherResponse) {
+                val locationId = location.locationId()
+                location.copy(id = locationId).let { locationDao.insert(it) }
+                current.copy(locationId = locationId).let {
                     currentWeatherDao.deleteAll()
-                    currentWeatherResponse.current.locationId = locationId()
-                    currentWeatherDao.insert(currentWeatherResponse.current)
+                    currentWeatherDao.insert(it)
                 }
             }
         }
-    }
 
     companion object {
 

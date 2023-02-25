@@ -1,7 +1,6 @@
 package com.example.weatherapp.model
 
 import android.annotation.SuppressLint
-import android.util.Log
 import com.example.weatherapp.api.WeatherForecastService
 import com.google.android.gms.location.FusedLocationProviderClient
 import kotlinx.coroutines.*
@@ -18,24 +17,25 @@ import javax.inject.Singleton
 class WeatherForecastRepository @Inject constructor(
     private val weatherService: WeatherForecastService,
     private val locationProviderClient: FusedLocationProviderClient,
-    private val weatherLocalDataSource: WeatherForecastLocalDataSource,
-    private val weatherRemoteDataSource: WeatherForecastRemoteDataSource
+    private val localWeather: WeatherForecastLocalDataSource,
+    private val remoteWeather: WeatherForecastRemoteDataSource
 ) {
 
     suspend fun getCurrentWeather(
         latitude: Double,
         longitude: Double
     ): Flow<CurrentWeatherResponse> = flow {
-        var weather = weatherLocalDataSource.getCurrentWeather(latitude, longitude)
-        if (weather == null || weather.current.isOld()) {
-            if (weather != null) {
-                Log.d("WeatherForecastRepository.getCurrentWeather", weather.current.isOld().toString())
+        localWeather.getWeatherLocation(latitude, longitude)?.let { location ->
+            localWeather.getCurrentWeather(location)?.let { current ->
+                emit(CurrentWeatherResponse(location, current))
+                if (!current.isOld()) return@flow
             }
-            weather = weatherRemoteDataSource.fetchCurrentWeather(latitude, longitude)
-            weatherLocalDataSource.insertCurrentWeather(weather)
         }
 
-        emit(weather)
+        remoteWeather.fetchCurrentWeather(latitude, longitude).let {
+            localWeather.insertCurrentWeather(it)
+            emit(it)
+        }
     }
 
     suspend fun getCurrent(latitude: Double, longitude: Double): Response<CurrentWeatherResponse> {
