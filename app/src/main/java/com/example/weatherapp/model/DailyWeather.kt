@@ -1,7 +1,23 @@
 package com.example.weatherapp.model
 
+import androidx.room.*
+import com.google.gson.annotations.JsonAdapter
+import java.util.*
+
+@Entity(
+    foreignKeys = [
+        ForeignKey(
+            entity = WeatherLocation::class,
+            parentColumns = ["id"],
+            childColumns = ["locationId"]
+        )
+    ],
+    indices = [Index("locationId")]
+)
 data class DailyWeather(
-    val time: String,
+    @field:JsonAdapter(JsonAdapters.DateAdapter::class)
+    @PrimaryKey
+    val time: Date,
     val temperatureMax: Double,
     val temperatureMin: Double,
     val apparentTemperatureMax: Double,
@@ -14,5 +30,6 @@ data class DailyWeather(
     val windGustsMax: Double,
     val windDirection: Double,
     val conditionText: String,
-    val conditionIcon: Int
+    val conditionIcon: Int,
+    val locationId: String? = null
 )

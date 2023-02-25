@@ -19,6 +19,7 @@ import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
 import java.util.*
 
 @AndroidEntryPoint
@@ -51,17 +52,16 @@ class DailyWeatherFragment : Fragment() {
     ): View {
         _binding = FragmentDailyWeatherBinding.inflate(inflater, container, false)
         val view = binding.root
-
+        val dateFormat = SimpleDateFormat("yyyy-MM-dd")
         val dailyWeatherAdapter = DailyWeatherAdapter { _, position ->
             viewModel.location.value?.let { location ->
                 viewModel.daily.value?.let {
                     val daily = it[position]
-                    val date = daily.time
                     val action = DailyWeatherFragmentDirections
                         .actionDailyWeatherFragmentToHourlyWeatherFragment(
                             latitude = location.latitude.toFloat(),
                             longitude = location.longitude.toFloat(),
-                            date = date,
+                            date = dateFormat.format(daily.time),
                             sunrise = daily.sunrise,
                             sunset = daily.sunset
                         )

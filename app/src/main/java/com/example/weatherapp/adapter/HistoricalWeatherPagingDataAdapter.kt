@@ -11,7 +11,7 @@ import com.example.weatherapp.util.WeatherIcon
 
 val USER_COMPARATOR = object : DiffUtil.ItemCallback<DailyWeather>() {
     override fun areItemsTheSame(oldItem: DailyWeather, newItem: DailyWeather): Boolean =
-        oldItem.time == newItem.time
+        oldItem.time.time == newItem.time.time
 
     override fun areContentsTheSame(oldItem: DailyWeather, newItem: DailyWeather): Boolean =
         oldItem == newItem
@@ -24,7 +24,7 @@ class DailyWeatherViewHolder(
     fun bind(weather: DailyWeather?) {
         weather?.let {
             with(binding) {
-                date.text = weather.time
+                date.text = weather.time.toString()
                 temperatureMax.text = weather.temperatureMax.toString()
                 temperatureMin.text = weather.temperatureMin.toString()
                 conditionText.text = weather.conditionText

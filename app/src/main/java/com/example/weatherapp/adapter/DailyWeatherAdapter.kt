@@ -1,6 +1,6 @@
 package com.example.weatherapp.adapter
 
-import android.util.Log
+import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
@@ -21,7 +21,7 @@ class DailyWeatherAdapter(
         private val DiffCallback = object : DiffUtil.ItemCallback<DailyWeather>() {
 
             override fun areItemsTheSame(oldItem: DailyWeather, newItem: DailyWeather): Boolean {
-                return oldItem.time == newItem.time
+                return oldItem.time.time == newItem.time.time
             }
 
             override fun areContentsTheSame(oldItem: DailyWeather, newItem: DailyWeather): Boolean {
@@ -54,17 +54,13 @@ class DailyWeatherAdapter(
         private var binding: DailyWeatherItemBinding
     ) : RecyclerView.ViewHolder(binding.root) {
 
-        private val decimal = DecimalFormat("0.#")
-        private val dateIn = SimpleDateFormat("yyyy-MM-dd")
-        private val dateOut = SimpleDateFormat("EEEE d")
-
         fun bind(dailyWeather: DailyWeather) {
-            with(binding) {
-                date.text = parseTime(dailyWeather.time)
-                temperatureMax.text = getString(R.string.deg_celsius, decimal.format(dailyWeather.temperatureMax))
-                temperatureMin.text = getString(R.string.deg_celsius, decimal.format(dailyWeather.temperatureMin))
-                conditionText.text = dailyWeather.conditionText
-                conditionIcon.setImageResource(WeatherIcon.getDrawableId(dailyWeather.conditionIcon))
+            with(dailyWeather) {
+                binding.date.text = dateFormat.format(time)
+                binding.temperatureMax.text = getString(R.string.deg_celsius, decimalFormat.format(temperatureMax))
+                binding.temperatureMin.text = getString(R.string.deg_celsius, decimalFormat.format(temperatureMin))
+                binding.conditionText.text = conditionText
+                binding.conditionIcon.setImageResource(WeatherIcon.getDrawableId(conditionIcon))
             }
         }
 
@@ -72,14 +68,10 @@ class DailyWeatherAdapter(
             return itemView.context.getString(resId, *formatArgs)
         }
 
-        private fun parseTime(dateString: String): String {
-            return try {
-                val date = dateIn.parse(dateString)
-                dateOut.format(date)
-            } catch (e: Exception) {
-                Log.d("DailyWeatherAdapter.parseTime()", e.localizedMessage)
-                dateString
-            }
+        companion object {
+            @SuppressLint("SimpleDateFormat")
+            private val dateFormat = SimpleDateFormat("EEEE d")
+            private val decimalFormat = DecimalFormat("0.#")
         }
     }
 }
