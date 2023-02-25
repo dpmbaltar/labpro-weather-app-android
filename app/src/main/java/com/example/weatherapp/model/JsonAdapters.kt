@@ -10,15 +10,29 @@ import java.util.*
 
 class JsonAdapters {
 
-    class DateTimeWithoutSecondsAdapter : TypeAdapter<Date>() {
+    companion object {
+        @SuppressLint("SimpleDateFormat")
+        private val dateFormat: DateFormat = SimpleDateFormat("yyyy-MM-dd")
 
         @SuppressLint("SimpleDateFormat")
-        private val dateFormat: DateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm")
+        private val dateTimeFormat: DateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm")
+    }
 
-        override fun read(`in`: JsonReader?): Date = dateFormat.parse(`in`!!.nextString())!!
+    class DateTimeAdapter : TypeAdapter<Date>() {
 
-        override fun write(out: JsonWriter?, value: Date?) {
-            out!!.value(value?.let { dateFormat.format(it) })
-        }
+        override fun read(reader: JsonReader): Date =
+            dateTimeFormat.parse(reader.nextString())!!
+
+        override fun write(writer: JsonWriter, value: Date): Unit =
+            writer.value(dateTimeFormat.format(value)).let {  }
+    }
+
+    class DateAdapter : TypeAdapter<Date>() {
+
+        override fun read(reader: JsonReader): Date =
+            dateFormat.parse(reader.nextString())!!
+
+        override fun write(writer: JsonWriter, value: Date): Unit =
+            writer.value(dateFormat.format(value)).let {  }
     }
 }

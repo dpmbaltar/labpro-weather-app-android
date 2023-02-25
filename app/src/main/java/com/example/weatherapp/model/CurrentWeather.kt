@@ -17,23 +17,19 @@ import java.util.Calendar.HOUR
     indices = [Index("location_id")]
 )
 data class CurrentWeather(
-    @field:JsonAdapter(JsonAdapters.DateTimeWithoutSecondsAdapter::class)
-    @PrimaryKey
-    @ColumnInfo(name = "time")
-    val time: Date,
-    val temperature: Double,
-    val apparentTemperature: Double,
-    val precipitation: Double,
-    val humidity: Double,
-    val windSpeed: Double,
-    val windDirection: Double,
-    val uv: Int,
-    val isDay: Boolean,
-    val conditionText: String,
-    val conditionIcon: Int,
-    @ColumnInfo(name = "location_id")
-    val locationId: String? = null
+    @field:JsonAdapter(JsonAdapters.DateTimeAdapter::class)
+    @ColumnInfo(name = "time") @PrimaryKey val time: Date,
+    @ColumnInfo(name = "temperature") val temperature: Double,
+    @ColumnInfo(name = "apparent_temperature") val apparentTemperature: Double,
+    @ColumnInfo(name = "precipitation") val precipitation: Double,
+    @ColumnInfo(name = "humidity") val humidity: Double,
+    @ColumnInfo(name = "wind_speed") val windSpeed: Double,
+    @ColumnInfo(name = "wind_direction") val windDirection: Double,
+    @ColumnInfo(name = "uv") val uv: Int,
+    @ColumnInfo(name = "is_day") val isDay: Boolean,
+    @ColumnInfo(name = "condition_text") val conditionText: String,
+    @ColumnInfo(name = "condition_icon") val conditionIcon: Int,
+    @ColumnInfo(name = "location_id") val locationId: String? = null
 ) {
-
-    fun isOld() = Calendar.getInstance().apply { add(HOUR, -1) }.time > time
+    fun isOld(): Boolean = Calendar.getInstance().apply { add(HOUR, -1) }.time > time
 }
