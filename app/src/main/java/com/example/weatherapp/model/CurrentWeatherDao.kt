@@ -4,17 +4,16 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface CurrentWeatherDao {
 
-    @Query("SELECT * FROM current_weather WHERE location_id = :locationId ORDER BY time DESC LIMIT 1")
+    @Query("SELECT * FROM CurrentWeather WHERE locationId = :locationId")
     fun getCurrentWeather(locationId: String): CurrentWeather?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(currentWeather: CurrentWeather)
 
-    @Query("DELETE FROM current_weather")
+    @Query("DELETE FROM CurrentWeather")
     suspend fun deleteAll()
 }
