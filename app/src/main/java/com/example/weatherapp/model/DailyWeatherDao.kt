@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import java.util.*
 
 @Dao
 interface DailyWeatherDao {
@@ -14,6 +15,6 @@ interface DailyWeatherDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(dailyWeather: DailyWeather)
 
-    @Query("DELETE FROM DailyWeather WHERE locationId = :locationId")
-    suspend fun delete(locationId: String)
+    @Query("DELETE FROM DailyWeather WHERE locationId = :locationId AND timestamp < :timestamp")
+    suspend fun deleteOld(locationId: String, timestamp: Calendar)
 }

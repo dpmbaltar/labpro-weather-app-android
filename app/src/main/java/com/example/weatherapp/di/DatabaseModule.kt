@@ -2,6 +2,7 @@ package com.example.weatherapp.di
 
 import android.content.Context
 import com.example.weatherapp.model.CurrentWeatherDao
+import com.example.weatherapp.model.DailyWeatherDao
 import com.example.weatherapp.model.WeatherDatabase
 import com.example.weatherapp.model.WeatherLocationDao
 import dagger.Module
@@ -27,4 +28,8 @@ class DatabaseModule {
     @Provides
     fun providesCurrentWeatherDao(weatherDatabase: WeatherDatabase): CurrentWeatherDao =
         weatherDatabase.currentWeatherDao()
+
+    @Provides
+    fun providesDailyWeatherDao(weatherDatabase: WeatherDatabase): DailyWeatherDao =
+        weatherDatabase.dailyWeatherDao()
 }

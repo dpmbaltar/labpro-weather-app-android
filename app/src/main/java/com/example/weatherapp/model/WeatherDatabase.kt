@@ -7,7 +7,7 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 
 @Database(
-    entities = [WeatherLocation::class, CurrentWeather::class],
+    entities = [WeatherLocation::class, CurrentWeather::class, DailyWeather::class],
     version = 1,
     exportSchema = false
 )
@@ -16,6 +16,7 @@ abstract class WeatherDatabase : RoomDatabase() {
 
     abstract fun weatherLocationDao(): WeatherLocationDao
     abstract fun currentWeatherDao(): CurrentWeatherDao
+    abstract fun dailyWeatherDao(): DailyWeatherDao
 
     companion object {
 

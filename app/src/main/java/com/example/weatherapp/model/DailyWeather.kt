@@ -31,5 +31,9 @@ data class DailyWeather(
     val windDirection: Double,
     val conditionText: String,
     val conditionIcon: Int,
-    val locationId: String? = null
-)
+    val locationId: String? = null,
+    val timestamp: Calendar = Calendar.getInstance()
+) {
+    fun isOld(): Boolean = Calendar.getInstance()
+        .apply { add(Calendar.HOUR, -1) }.timeInMillis > timestamp.timeInMillis
+}
