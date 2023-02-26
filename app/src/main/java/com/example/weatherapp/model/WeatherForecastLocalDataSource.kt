@@ -3,6 +3,8 @@ package com.example.weatherapp.model
 import com.example.weatherapp.di.IoDispatcher
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
+import java.util.*
+import java.util.Calendar.HOUR
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -10,6 +12,7 @@ import javax.inject.Singleton
 class WeatherForecastLocalDataSource @Inject constructor(
     private val locationDao: WeatherLocationDao,
     private val currentWeatherDao: CurrentWeatherDao,
+    private val dailyWeatherDao: DailyWeatherDao,
     @IoDispatcher private val coroutineDispatcher: CoroutineDispatcher
 ) {
 
@@ -41,6 +44,30 @@ class WeatherForecastLocalDataSource @Inject constructor(
             }
         }
 
+    suspend fun getDailyWeather(weatherLocation: WeatherLocation): List<DailyWeather> =
+        withContext(coroutineDispatcher) {
+            dailyWeatherDao.getDailyWeather(weatherLocation.locationId())
+        }
+
+    suspend fun insertDailyWeather(dailyWeatherResponse: DailyWeatherResponse) =
+        withContext(coroutineDispatcher) {
+            with(dailyWeatherResponse) {
+                val currentTime = Calendar.getInstance()
+                val locationId = location.locationId()
+
+                location.copy(id = locationId).let { locationDao.insert(it) }
+                dailyWeatherDao.deleteOld(locationId, currentTime.apply { add(HOUR, -1) })
+                daily.forEach { dailyWeather ->
+                    dailyWeather.copy(
+                        locationId = locationId,
+                        timestamp = Calendar.getInstance()
+                    ).let {
+                        dailyWeatherDao.insert(it)
+                    }
+                }
+            }
+        }
+
     companion object {
 
         @Volatile
@@ -49,12 +76,14 @@ class WeatherForecastLocalDataSource @Inject constructor(
         fun getInstance(
             locationDao: WeatherLocationDao,
             currentWeatherDao: CurrentWeatherDao,
+            dailyWeatherDao: DailyWeatherDao,
             coroutineDispatcher: CoroutineDispatcher
         ) =
             instance ?: synchronized(this) {
                 instance ?: WeatherForecastLocalDataSource(
                     locationDao,
                     currentWeatherDao,
+                    dailyWeatherDao,
                     coroutineDispatcher
                 ).also { instance = it }
             }

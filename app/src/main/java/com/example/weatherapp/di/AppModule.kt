@@ -29,11 +29,13 @@ class AppModule {
     fun providesWeatherForecastLocalDataSource(
         locationDao: WeatherLocationDao,
         currentWeatherDao: CurrentWeatherDao,
+        dailyWeatherDao: DailyWeatherDao,
         @IoDispatcher coroutineDispatcher: CoroutineDispatcher
     ): WeatherForecastLocalDataSource =
         WeatherForecastLocalDataSource.getInstance(
             locationDao,
             currentWeatherDao,
+            dailyWeatherDao,
             coroutineDispatcher
         )
 
@@ -48,13 +50,11 @@ class AppModule {
     @Provides
     fun providesWeatherForecastRepository(
         weatherService: WeatherForecastService,
-        locationProviderClient: FusedLocationProviderClient,
         weatherLocalDataSource: WeatherForecastLocalDataSource,
         weatherRemoteDataSource: WeatherForecastRemoteDataSource
     ): WeatherForecastRepository =
         WeatherForecastRepository.getInstance(
             weatherService,
-            locationProviderClient,
             weatherLocalDataSource,
             weatherRemoteDataSource
         )

@@ -2,7 +2,6 @@ package com.example.weatherapp.model
 
 import android.annotation.SuppressLint
 import com.example.weatherapp.api.WeatherForecastService
-import com.google.android.gms.location.FusedLocationProviderClient
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -16,7 +15,6 @@ import javax.inject.Singleton
 @SuppressLint("MissingPermission")
 class WeatherForecastRepository @Inject constructor(
     private val weatherService: WeatherForecastService,
-    private val locationProviderClient: FusedLocationProviderClient,
     private val localWeather: WeatherForecastLocalDataSource,
     private val remoteWeather: WeatherForecastRemoteDataSource
 ) {
@@ -42,17 +40,20 @@ class WeatherForecastRepository @Inject constructor(
         latitude: Double,
         longitude: Double
     ): Flow<DailyWeatherResponse> = flow {
+        localWeather.getWeatherLocation(latitude, longitude)?.let { location ->
+            localWeather.getDailyWeather(location).let { daily ->
+                if (daily.isNotEmpty()) {
+                    emit(DailyWeatherResponse(location, daily))
+                    if (daily.first().isOld().not())
+                        return@flow
+                }
+            }
+        }
+
         remoteWeather.fetchDailyWeather(latitude, longitude).let {
+            localWeather.insertDailyWeather(it)
             emit(it)
         }
-    }
-
-    suspend fun getCurrent(latitude: Double, longitude: Double): Response<CurrentWeatherResponse> {
-        return weatherService.current(latitude, longitude)
-    }
-
-    suspend fun getDaily(latitude: Double, longitude: Double): Response<DailyWeatherResponse> {
-        return weatherService.daily(latitude, longitude)
     }
 
     suspend fun getHourly(
@@ -84,6 +85,7 @@ class WeatherForecastRepository @Inject constructor(
     }
 
     companion object {
+
         @SuppressLint("SimpleDateFormat")
         private val dateFormat = SimpleDateFormat("yyyy-MM-dd")
 
@@ -92,14 +94,12 @@ class WeatherForecastRepository @Inject constructor(
 
         fun getInstance(
             weatherService: WeatherForecastService,
-            locationProviderClient: FusedLocationProviderClient,
             weatherLocalDataSource: WeatherForecastLocalDataSource,
             weatherRemoteDataSource: WeatherForecastRemoteDataSource
         ) =
             instance ?: synchronized(this) {
                 instance ?: WeatherForecastRepository(
                     weatherService,
-                    locationProviderClient,
                     weatherLocalDataSource,
                     weatherRemoteDataSource
                 ).also { instance = it }
