@@ -1,4 +1,4 @@
-package com.example.weatherapp.model
+package com.example.weatherapp.util
 
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*

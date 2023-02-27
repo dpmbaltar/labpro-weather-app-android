@@ -7,6 +7,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
 import com.example.weatherapp.model.*
+import com.example.weatherapp.util.asResult
+import com.example.weatherapp.util.Result
 import com.google.android.gms.location.FusedLocationProviderClient
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*

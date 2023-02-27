@@ -4,6 +4,8 @@ import android.annotation.SuppressLint
 import android.location.Location
 import androidx.lifecycle.*
 import com.example.weatherapp.model.*
+import com.example.weatherapp.util.asResult
+import com.example.weatherapp.util.Result
 import com.google.android.gms.location.FusedLocationProviderClient
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
