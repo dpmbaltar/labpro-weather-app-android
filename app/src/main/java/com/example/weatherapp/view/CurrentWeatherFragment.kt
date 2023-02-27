@@ -1,27 +1,27 @@
 package com.example.weatherapp.view
 
-import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.*
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.example.weatherapp.R
 import com.example.weatherapp.databinding.FragmentCurrentWeatherBinding
-import com.example.weatherapp.model.CurrentWeatherResponse
 import com.example.weatherapp.util.ConnectionException
 import com.example.weatherapp.util.RemoteResponseException
 import com.example.weatherapp.util.WeatherIcon
 import com.example.weatherapp.viewmodel.CurrentWeatherViewModel
+import com.example.weatherapp.viewmodel.CurrentWeatherViewModel.CurrentWeatherUiState
 import com.example.weatherapp.viewmodel.CurrentWeatherViewModel.UiState
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import java.text.DecimalFormat
-import java.text.SimpleDateFormat
 
 @AndroidEntryPoint
 class CurrentWeatherFragment : Fragment() {
@@ -58,35 +58,40 @@ class CurrentWeatherFragment : Fragment() {
             viewModel.uiState.collect { uiState ->
                 when (uiState) {
                     is UiState.Loading -> showLoading()
-                    is UiState.Success -> showCurrentWeather(uiState.data)
                     is UiState.Error -> showError(uiState.throwable)
+                    else -> Unit
                 }
+            }
+        }
+
+        lifecycleScope.launch {
+            viewModel.currentWeather.collect {
+                showCurrentWeather(it)
             }
         }
 
         return binding.root
     }
 
-    private fun showLoading(isRefreshing: Boolean = true) {
-        refreshView.isRefreshing = isRefreshing
-    }
-
-    private fun showCurrentWeather(data: CurrentWeatherResponse) {
+    private fun showCurrentWeather(data: CurrentWeatherUiState) {
         with(data) {
-            val locationName = "${location.name}, ${location.region}"
-            val iconId = WeatherIcon.getDrawableId(current.conditionIcon, current.isDay)
-            binding.temperature.setCompoundDrawablesWithIntrinsicBounds(iconId, 0, 0, 0)
-            binding.temperature.text = decimalFormat.format(current.temperature).plus(DEGREE_CELSIUS)
-            binding.conditionText.text = current.conditionText
-            binding.uv.text = decimalFormat.format(current.uv)
-            binding.windSpeed.text = decimalFormat.format(current.windSpeed).plus(KM_H)
-            binding.humidity.text = decimalFormat.format(current.humidity).plus(PERCENT)
-            binding.time.text = dateFormat.format(current.time)
+            val icon = WeatherIcon.getDrawableId(conditionIcon, isDay)
+            binding.temperature.setCompoundDrawablesWithIntrinsicBounds(icon, 0, 0, 0)
+            binding.temperature.text = temperature
+            binding.conditionText.text = conditionText
+            binding.uv.text = uv
+            binding.windSpeed.text = windSpeed
+            binding.humidity.text = humidity
+            binding.time.text = time
             binding.locationName.text = locationName
             binding.currentWeatherLayout.visibility = View.VISIBLE
         }.also {
             showLoading(false)
         }
+    }
+
+    private fun showLoading(isRefreshing: Boolean = true) {
+        refreshView.isRefreshing = isRefreshing
     }
 
     private fun showError(throwable: Throwable?) {
@@ -109,14 +114,6 @@ class CurrentWeatherFragment : Fragment() {
     companion object {
 
         private val TAG = CurrentWeatherFragment::class.java.simpleName
-
-        private const val DEGREE_CELSIUS = "°C"
-        private const val KM_H = " km/h"
-        private const val PERCENT = "%"
-
-        @SuppressLint("SimpleDateFormat")
-        private val dateFormat = SimpleDateFormat("EEEE, d MMM")
-        private val decimalFormat = DecimalFormat("0.#")
 
         fun newInstance() = CurrentWeatherFragment()
     }
