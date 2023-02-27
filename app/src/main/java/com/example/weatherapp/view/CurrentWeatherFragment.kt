@@ -9,8 +9,12 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.*
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import com.example.weatherapp.R
 import com.example.weatherapp.databinding.FragmentCurrentWeatherBinding
+import com.example.weatherapp.model.CurrentWeather
 import com.example.weatherapp.model.CurrentWeatherResponse
+import com.example.weatherapp.util.ConnectionException
+import com.example.weatherapp.util.RemoteResponseException
 import com.example.weatherapp.util.WeatherIcon
 import com.example.weatherapp.viewmodel.CurrentWeatherViewModel
 import com.example.weatherapp.viewmodel.CurrentWeatherViewModel.UiState
@@ -87,14 +91,25 @@ class CurrentWeatherFragment : Fragment() {
     }
 
     private fun showError(throwable: Throwable?) {
-        Log.d(null, throwable?.localizedMessage ?: "Error", throwable)
-        Snackbar.make(binding.root, throwable?.localizedMessage ?: "Error", Snackbar.LENGTH_LONG)
-            .setAction("Action", null)
-            .show()
-            .also { showLoading(false) }
+        Log.d(TAG, throwable?.localizedMessage, throwable)
+
+        val message = when (throwable) {
+            is ConnectionException -> getString(R.string.connection_exception)
+            is RemoteResponseException -> getString(R.string.remote_response_exception)
+            else -> getString(R.string.unknown_exception)
+        }
+
+        activity?.currentFocus?.let { view ->
+            Snackbar.make(view, message, Snackbar.LENGTH_LONG)
+                .setAction("Action", null)
+                .show()
+                .also { showLoading(false) }
+        }
     }
 
     companion object {
+
+        private val TAG = CurrentWeather::class.java.simpleName
 
         private const val DEGREE_CELSIUS = "°C"
         private const val KM_H = " km/h"

@@ -4,7 +4,7 @@
     <string name="forecast">Semanal</string>
     <string name="history">Histórico</string>
     <string name="condition_text">Condición actual</string>
-    <string name="loading_text">Mirando el cielo...</string>
+    <string name="loading_text">Mirando el cielo…</string>
     <string name="uv_index">Índice UV</string>
     <string name="wind">Viento</string>
     <string name="humidity">Humedad</string>
@@ -16,4 +16,7 @@
     <string name="go_back">Volver atrás</string>
     <string name="sunrise">Amanecer</string>
     <string name="sunset">Ocaso</string>
+    <string name="connection_exception">Error de conexión</string>
+    <string name="remote_response_exception">Error al solicitar datos al servidor</string>
+    <string name="unknown_exception">Error desconocido</string>
 </resources>

@@ -1,7 +1,9 @@
 package com.example.weatherapp.model
 
-import android.util.Log
 import com.example.weatherapp.api.WeatherForecastService
+import com.example.weatherapp.util.ConnectionException
+import com.example.weatherapp.util.RemoteResponseException
+import com.google.gson.Gson
 import java.io.IOException
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -17,17 +19,19 @@ class WeatherForecastRemoteDataSource @Inject constructor(
         longitude: Double
     ): CurrentWeatherResponse {
         try {
-            val response = weatherService.current(latitude, longitude)
-            if (response.isSuccessful) {
-                return response.body()!!
-            } else {
-                val errorBody = response.errorBody() ?: ""
-                throw Exception("Response error: $errorBody")
+            weatherService.current(latitude, longitude).let {
+                if (it.isSuccessful) {
+                    return it.body()!!
+                } else {
+                    val errorBody: String = it.errorBody()?.string() ?: ""
+                    val json = Gson().fromJson<Map<String, Any>>(errorBody, Map::class.java)
+                    throw RemoteResponseException("Response error", json)
+                }
             }
         } catch (e: IOException) {
-            throw Exception(e.localizedMessage)
+            throw ConnectionException(e.message)
         } catch (e: Exception) {
-            throw Exception(e.localizedMessage)
+            throw Exception(e.message)
         }
     }
 
@@ -36,24 +40,23 @@ class WeatherForecastRemoteDataSource @Inject constructor(
         longitude: Double
     ): DailyWeatherResponse {
         return try {
-            weatherService.daily(latitude, longitude).let { it ->
+            weatherService.daily(latitude, longitude).let {
                 if (it.isSuccessful) {
                     it.body()!!
                 } else {
-                    it.errorBody().let { body ->
-                        Log.d(TAG, body.toString())
-                        throw Exception("Error ${it.code()}")
-                    }
+                    val errorBody: String = it.errorBody()?.string() ?: ""
+                    val json = Gson().fromJson<Map<String, Any>>(errorBody, Map::class.java)
+                    throw RemoteResponseException("Response error", json)
                 }
             }
+        } catch (e: IOException) {
+            throw ConnectionException(e.message)
         } catch (e: Exception) {
-            throw Exception(e.localizedMessage, e)
+            throw Exception(e.message)
         }
     }
 
     companion object {
-
-        private val TAG = WeatherForecastRemoteDataSource::class.java.simpleName
 
         @Volatile
         private var instance: WeatherForecastRemoteDataSource? = null
