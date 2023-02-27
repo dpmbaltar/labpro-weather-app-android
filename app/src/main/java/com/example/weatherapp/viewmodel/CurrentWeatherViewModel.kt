@@ -52,6 +52,8 @@ class CurrentWeatherViewModel @Inject constructor(
     private val location get() = _location.asFlow()
     private val _uiState = MutableStateFlow<UiState>(UiState.Loading)
     val uiState: StateFlow<UiState> = _uiState
+    val isRefreshing: Flow<Boolean> = _uiState.map { it is UiState.Loading }
+    val error: Flow<Throwable?> = _uiState.filterIsInstance<UiState.Error>().map { it.throwable }
     val currentWeather: Flow<CurrentWeatherUiState> = _uiState.filterIsInstance<UiState.Success>()
         .map { uiState ->
             uiState.data.let { weather ->

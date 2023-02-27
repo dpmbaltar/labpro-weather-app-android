@@ -18,7 +18,6 @@ import com.example.weatherapp.util.RemoteResponseException
 import com.example.weatherapp.util.WeatherIcon
 import com.example.weatherapp.viewmodel.CurrentWeatherViewModel
 import com.example.weatherapp.viewmodel.CurrentWeatherViewModel.CurrentWeatherUiState
-import com.example.weatherapp.viewmodel.CurrentWeatherViewModel.UiState
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -54,21 +53,9 @@ class CurrentWeatherFragment : Fragment() {
             }
         }
 
-        lifecycleScope.launch {
-            viewModel.uiState.collect { uiState ->
-                when (uiState) {
-                    is UiState.Loading -> showLoading()
-                    is UiState.Error -> showError(uiState.throwable)
-                    else -> Unit
-                }
-            }
-        }
-
-        lifecycleScope.launch {
-            viewModel.currentWeather.collect {
-                showCurrentWeather(it)
-            }
-        }
+        lifecycleScope.launch { viewModel.error.collect { showError(it) } }
+        lifecycleScope.launch { viewModel.isRefreshing.collect { showLoading(it) } }
+        lifecycleScope.launch { viewModel.currentWeather.collect { showCurrentWeather(it) } }
 
         return binding.root
     }
@@ -85,8 +72,6 @@ class CurrentWeatherFragment : Fragment() {
             binding.time.text = time
             binding.locationName.text = locationName
             binding.currentWeatherLayout.visibility = View.VISIBLE
-        }.also {
-            showLoading(false)
         }
     }
 
@@ -107,7 +92,6 @@ class CurrentWeatherFragment : Fragment() {
             Snackbar.make(view, message, Snackbar.LENGTH_LONG)
                 .setAction("Action", null)
                 .show()
-                .also { showLoading(false) }
         }
     }
 
