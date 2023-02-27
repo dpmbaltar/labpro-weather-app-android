@@ -53,9 +53,9 @@ class CurrentWeatherFragment : Fragment() {
             }
         }
 
-        lifecycleScope.launch { viewModel.error.collect { showError(it) } }
-        lifecycleScope.launch { viewModel.isRefreshing.collect { showLoading(it) } }
         lifecycleScope.launch { viewModel.currentWeather.collect { showCurrentWeather(it) } }
+        lifecycleScope.launch { viewModel.loading.collect { showLoading(it) } }
+        lifecycleScope.launch { viewModel.error.collect { showError(it) } }
 
         return binding.root
     }
@@ -80,7 +80,7 @@ class CurrentWeatherFragment : Fragment() {
     }
 
     private fun showError(throwable: Throwable?) {
-        Log.d(TAG, throwable?.localizedMessage, throwable)
+        Log.d(TAG, throwable?.message, throwable)
 
         val message = when (throwable) {
             is ConnectionException -> getString(R.string.connection_exception)
@@ -96,7 +96,6 @@ class CurrentWeatherFragment : Fragment() {
     }
 
     companion object {
-
         private val TAG = CurrentWeatherFragment::class.java.simpleName
 
         fun newInstance() = CurrentWeatherFragment()

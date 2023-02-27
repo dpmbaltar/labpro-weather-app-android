@@ -4,8 +4,8 @@ import android.annotation.SuppressLint
 import android.location.Location
 import androidx.lifecycle.*
 import com.example.weatherapp.model.*
-import com.example.weatherapp.util.asResult
 import com.example.weatherapp.util.Result
+import com.example.weatherapp.util.asResult
 import com.google.android.gms.location.FusedLocationProviderClient
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
@@ -22,7 +22,7 @@ class CurrentWeatherViewModel @Inject constructor(
     private val weatherRepository: WeatherForecastRepository
 ) : ViewModel() {
 
-    sealed interface UiState {
+    private sealed interface UiState {
 
         object Loading : UiState
 
@@ -35,7 +35,7 @@ class CurrentWeatherViewModel @Inject constructor(
         ) : UiState
     }
 
-    data class CurrentWeatherUiState (
+    data class CurrentWeatherUiState(
         val time: String,
         val temperature: String,
         val apparentTemperature: String,
@@ -50,12 +50,12 @@ class CurrentWeatherViewModel @Inject constructor(
         val locationName: String
     )
 
+    private val _uiState = MutableStateFlow<UiState>(UiState.Loading)
     private val _location = MutableLiveData<Location>()
     private val location get() = _location.asFlow()
-    private val _uiState = MutableStateFlow<UiState>(UiState.Loading)
-    val uiState: StateFlow<UiState> = _uiState
-    val isRefreshing: Flow<Boolean> = _uiState.map { it is UiState.Loading }
+
     val error: Flow<Throwable?> = _uiState.filterIsInstance<UiState.Error>().map { it.throwable }
+    val loading: Flow<Boolean> = _uiState.map { it is UiState.Loading }
     val currentWeather: Flow<CurrentWeatherUiState> = _uiState.filterIsInstance<UiState.Success>()
         .map { uiState ->
             uiState.data.let { weather ->
@@ -78,15 +78,10 @@ class CurrentWeatherViewModel @Inject constructor(
             }
         }
 
-    init {
-        locationProvider.lastLocation.addOnSuccessListener { _location.postValue(it) }
-    }
-
-    fun refresh() {
-        viewModelScope.launch {
-            location.collectLatest {
-                weatherRepository
-                    .getCurrentWeather(it.latitude, it.longitude).asResult()
+    fun refresh() = viewModelScope.launch {
+        location.collect {
+            with(it) {
+                weatherRepository.getCurrentWeather(latitude, longitude).asResult()
                     .collect { result ->
                         _uiState.update {
                             when (result) {
@@ -95,13 +90,18 @@ class CurrentWeatherViewModel @Inject constructor(
                                 is Result.Error -> UiState.Error(result.exception)
                             }
                         }
-                }
+                    }
             }
         }
     }
 
-    companion object {
+    init {
+        locationProvider.lastLocation.addOnSuccessListener {
+            _location.postValue(it)
+        }
+    }
 
+    companion object {
         private const val DEG_C = "°C"
         private const val KM_H = " km/h"
         private const val PERCENT = "%"
