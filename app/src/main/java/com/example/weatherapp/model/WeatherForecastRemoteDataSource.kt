@@ -5,6 +5,7 @@ import com.example.weatherapp.util.ConnectionException
 import com.example.weatherapp.util.RemoteResponseException
 import com.google.gson.Gson
 import java.io.IOException
+import java.net.SocketTimeoutException
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -28,6 +29,8 @@ class WeatherForecastRemoteDataSource @Inject constructor(
                     throw RemoteResponseException("Response error", json)
                 }
             }
+        } catch (e: SocketTimeoutException) {
+            throw ConnectionException(e.message)
         } catch (e: IOException) {
             throw ConnectionException(e.message)
         } catch (e: Exception) {
@@ -49,6 +52,8 @@ class WeatherForecastRemoteDataSource @Inject constructor(
                     throw RemoteResponseException("Response error", json)
                 }
             }
+        } catch (e: SocketTimeoutException) {
+            throw ConnectionException(e.message)
         } catch (e: IOException) {
             throw ConnectionException(e.message)
         } catch (e: Exception) {
