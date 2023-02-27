@@ -88,7 +88,7 @@ class CurrentWeatherFragment : Fragment() {
             else -> getString(R.string.unknown_exception)
         }
 
-        activity?.currentFocus?.let { view ->
+        activity?.findViewById<View>(R.id.main_layout)?.let { view ->
             Snackbar.make(view, message, Snackbar.LENGTH_LONG)
                 .setAction("Action", null)
                 .show()
