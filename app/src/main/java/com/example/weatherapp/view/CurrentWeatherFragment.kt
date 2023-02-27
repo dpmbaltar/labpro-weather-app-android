@@ -11,7 +11,6 @@ import androidx.lifecycle.*
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.example.weatherapp.R
 import com.example.weatherapp.databinding.FragmentCurrentWeatherBinding
-import com.example.weatherapp.model.CurrentWeather
 import com.example.weatherapp.model.CurrentWeatherResponse
 import com.example.weatherapp.util.ConnectionException
 import com.example.weatherapp.util.RemoteResponseException
@@ -109,7 +108,7 @@ class CurrentWeatherFragment : Fragment() {
 
     companion object {
 
-        private val TAG = CurrentWeather::class.java.simpleName
+        private val TAG = CurrentWeatherFragment::class.java.simpleName
 
         private const val DEGREE_CELSIUS = "°C"
         private const val KM_H = " km/h"
