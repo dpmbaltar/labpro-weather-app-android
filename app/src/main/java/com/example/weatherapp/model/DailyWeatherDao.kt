@@ -9,7 +9,7 @@ import java.util.*
 @Dao
 interface DailyWeatherDao {
 
-    @Query("SELECT * FROM DailyWeather WHERE locationId = :locationId ORDER BY timestamp DESC LIMIT 7")
+    @Query("SELECT * FROM DailyWeather WHERE locationId = :locationId ORDER BY time ASC, timestamp DESC LIMIT 7")
     fun getDailyWeather(locationId: String): List<DailyWeather>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
