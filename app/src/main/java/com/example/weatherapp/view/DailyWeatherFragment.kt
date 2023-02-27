@@ -1,7 +1,7 @@
 package com.example.weatherapp.view
 
-import android.annotation.SuppressLint
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,14 +16,14 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.example.weatherapp.R
 import com.example.weatherapp.adapter.DailyWeatherAdapter
 import com.example.weatherapp.databinding.FragmentDailyWeatherBinding
-import com.example.weatherapp.model.DailyWeatherResponse
+import com.example.weatherapp.util.ConnectionException
+import com.example.weatherapp.util.RemoteResponseException
 import com.example.weatherapp.viewmodel.DailyWeatherViewModel
-import com.example.weatherapp.viewmodel.DailyWeatherViewModel.UiState
+import com.example.weatherapp.viewmodel.DailyWeatherViewModel.DailyWeatherUiState
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import java.util.*
 
 @AndroidEntryPoint
 class DailyWeatherFragment : Fragment() {
@@ -35,7 +35,6 @@ class DailyWeatherFragment : Fragment() {
     private var _binding: FragmentDailyWeatherBinding? = null
     private val binding get() = _binding!!
 
-    @SuppressLint("MissingPermission")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewModel = ViewModelProvider(this)[DailyWeatherViewModel::class.java]
@@ -46,7 +45,6 @@ class DailyWeatherFragment : Fragment() {
         }
     }
 
-    @SuppressLint("SimpleDateFormat")
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -54,27 +52,12 @@ class DailyWeatherFragment : Fragment() {
     ): View {
         _binding = FragmentDailyWeatherBinding.inflate(inflater, container, false)
         val view = binding.root
-        //val navController = view.findNavController()
-        //val dateFormat = SimpleDateFormat("yyyy-MM-dd")
 
         dailyWeatherAdapter = DailyWeatherAdapter { _, _ ->
             val bottomSheet = BottomSheetDialog(requireContext())
             bottomSheet.setContentView(R.layout.loading_item)
             bottomSheet.show()
-            /*lifecycleScope.launch {
-                viewModel.uiState.filterIsInstance<UiState.Success>().collect {
-                    navController.navigate(
-                        DailyWeatherFragmentDirections
-                            .actionDailyWeatherFragmentToHourlyWeatherFragment(
-                                latitude = it.data.location.latitude.toFloat(),
-                                longitude = it.data.location.longitude.toFloat(),
-                                date = dateFormat.format(daily.time),
-                                sunrise = daily.sunrise,
-                                sunset = daily.sunset
-                            )
-                    )
-                }
-            }*/
+            // TODO: use BottomSheet for HourlyWeather
         }
 
         recyclerView = binding.dailyWeather
@@ -86,33 +69,38 @@ class DailyWeatherFragment : Fragment() {
             }
         }
 
-        lifecycleScope.launch {
-            viewModel.uiState.collect { uiState ->
-                when (uiState) {
-                    is UiState.Loading -> showLoading()
-                    is UiState.Success -> showDailyWeather(uiState.data)
-                    is UiState.Error -> showError(uiState.throwable)
-                }
-            }
-        }
+        lifecycleScope.launch { viewModel.dailyWeather.collect { showDailyWeather(it) } }
+        lifecycleScope.launch { viewModel.loading.collect { showLoading(it) } }
+        lifecycleScope.launch { viewModel.error.collect { showError(it) } }
 
         return view
+    }
+
+    private fun showDailyWeather(data: List<DailyWeatherUiState>) {
+        dailyWeatherAdapter.submitList(data)
     }
 
     private fun showLoading(isRefreshing: Boolean = true) {
         refreshView.isRefreshing = isRefreshing
     }
 
-    private fun showDailyWeather(data: DailyWeatherResponse) {
-        dailyWeatherAdapter.submitList(data.daily).also {
-            showLoading(false)
+    private fun showError(throwable: Throwable?) {
+        Log.d(TAG, throwable?.message, throwable)
+
+        val message = when (throwable) {
+            is ConnectionException -> getString(R.string.connection_exception)
+            is RemoteResponseException -> getString(R.string.remote_response_exception)
+            else -> getString(R.string.unknown_exception)
+        }
+
+        activity?.findViewById<View>(R.id.main_layout)?.let { view ->
+            Snackbar.make(view, message, Snackbar.LENGTH_LONG)
+                .setAction("Action", null)
+                .show()
         }
     }
 
-    private fun showError(throwable: Throwable?) {
-        Snackbar.make(binding.root, throwable?.localizedMessage ?: "Error", Snackbar.LENGTH_LONG)
-            .setAction("Action", null)
-            .show()
-            .also { showLoading(false) }
+    companion object {
+        private val TAG = DailyWeatherFragment::class.java.simpleName
     }
 }

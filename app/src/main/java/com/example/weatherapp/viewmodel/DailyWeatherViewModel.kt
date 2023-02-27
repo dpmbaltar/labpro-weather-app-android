@@ -7,12 +7,15 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
 import com.example.weatherapp.model.*
-import com.example.weatherapp.util.asResult
 import com.example.weatherapp.util.Result
+import com.example.weatherapp.util.asResult
 import com.google.android.gms.location.FusedLocationProviderClient
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import java.text.DecimalFormat
+import java.text.SimpleDateFormat
+import java.util.*
 import javax.inject.Inject
 
 @SuppressLint("MissingPermission")
@@ -22,7 +25,7 @@ class DailyWeatherViewModel @Inject constructor(
     private val weatherRepository: WeatherForecastRepository
 ) : ViewModel() {
 
-    sealed interface UiState {
+    private sealed interface UiState {
 
         object Loading : UiState
 
@@ -35,20 +38,39 @@ class DailyWeatherViewModel @Inject constructor(
         ) : UiState
     }
 
+    data class DailyWeatherUiState(
+        val time: String,
+        val temperatureMax: String,
+        val temperatureMin: String,
+        val conditionText: String,
+        val conditionIcon: Int
+    )
+
+    private val _uiState = MutableStateFlow<UiState>(UiState.Loading)
     private val _location = MutableLiveData<Location>()
     private val location: Flow<Location> get() = _location.asFlow()
-    private val _uiState = MutableStateFlow<UiState>(UiState.Loading)
-    val uiState: StateFlow<UiState> = _uiState
 
-    init {
-        locationProvider.lastLocation.addOnSuccessListener { _location.postValue(it) }
-    }
+    val error: Flow<Throwable?> = _uiState.filterIsInstance<UiState.Error>().map { it.throwable }
+    val loading: Flow<Boolean> = _uiState.map { it is UiState.Loading }
+    val dailyWeather: Flow<List<DailyWeatherUiState>> = _uiState.filterIsInstance<UiState.Success>()
+        .map { uiState ->
+            uiState.data.daily.mapIndexed { _, dailyWeather ->
+                with(dailyWeather) {
+                    DailyWeatherUiState(
+                        time = dateFormat.format(time),
+                        temperatureMax = decimalFormat.format(temperatureMax).plus(DEG_C),
+                        temperatureMin = decimalFormat.format(temperatureMin).plus(DEG_C),
+                        conditionText = conditionText,
+                        conditionIcon = conditionIcon
+                    )
+                }
+            }
+        }
 
-    fun refresh() {
-        viewModelScope.launch {
-            location.collectLatest { location ->
-                weatherRepository
-                    .getDailyWeather(location.latitude, location.longitude).asResult()
+    fun refresh() = viewModelScope.launch {
+        location.collect {
+            with(it) {
+                weatherRepository.getDailyWeather(latitude, longitude).asResult()
                     .collect { result ->
                         _uiState.update {
                             when (result) {
@@ -60,5 +82,19 @@ class DailyWeatherViewModel @Inject constructor(
                     }
             }
         }
+    }
+
+    init {
+        locationProvider.lastLocation.addOnSuccessListener {
+            _location.postValue(it)
+        }
+    }
+
+    companion object {
+        private const val DEG_C = "°C"
+
+        @SuppressLint("SimpleDateFormat")
+        private val dateFormat = SimpleDateFormat("EEEE, d MMM")
+        private val decimalFormat = DecimalFormat("0.#")
     }
 }
