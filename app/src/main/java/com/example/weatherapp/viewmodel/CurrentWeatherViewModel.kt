@@ -4,14 +4,11 @@ import android.annotation.SuppressLint
 import android.location.Location
 import androidx.lifecycle.*
 import com.example.weatherapp.model.*
-import com.example.weatherapp.util.Result
-import com.example.weatherapp.util.asResult
+import com.example.weatherapp.util.*
 import com.google.android.gms.location.FusedLocationProviderClient
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import java.text.DecimalFormat
-import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
 
@@ -61,14 +58,14 @@ class CurrentWeatherViewModel @Inject constructor(
             uiState.data.let { weather ->
                 with(weather.current) {
                     CurrentWeatherUiState(
-                        time = dateFormat.format(time),
-                        temperature = decimalFormat.format(temperature).plus(DEG_C),
-                        apparentTemperature = decimalFormat.format(apparentTemperature).plus(DEG_C),
-                        precipitation = decimalFormat.format(precipitation).plus(PERCENT),
-                        humidity = decimalFormat.format(humidity).plus(PERCENT),
-                        windSpeed = decimalFormat.format(windSpeed).plus(KM_H),
+                        time = time.weekdayDateMonth(),
+                        temperature = temperature.degreesCelsius(),
+                        apparentTemperature = apparentTemperature.degreesCelsius(),
+                        precipitation = precipitation.percent(),
+                        humidity = humidity.percent(),
+                        windSpeed = windSpeed.kilometersPerHour(),
                         windDirection = windDirection,
-                        uv = decimalFormat.format(uv),
+                        uv = uv.toString(),
                         isDay = isDay,
                         conditionText = conditionText,
                         conditionIcon = conditionIcon,
@@ -99,15 +96,5 @@ class CurrentWeatherViewModel @Inject constructor(
         locationProvider.lastLocation.addOnSuccessListener {
             _location.postValue(it)
         }
-    }
-
-    companion object {
-        private const val DEG_C = "°C"
-        private const val KM_H = " km/h"
-        private const val PERCENT = "%"
-
-        @SuppressLint("SimpleDateFormat")
-        private val dateFormat = SimpleDateFormat("EEEE, d MMM")
-        private val decimalFormat = DecimalFormat("0.#")
     }
 }

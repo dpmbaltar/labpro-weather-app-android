@@ -7,14 +7,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
 import com.example.weatherapp.model.*
-import com.example.weatherapp.util.Result
-import com.example.weatherapp.util.asResult
+import com.example.weatherapp.util.*
 import com.google.android.gms.location.FusedLocationProviderClient
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import java.text.DecimalFormat
-import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
 
@@ -57,9 +54,9 @@ class DailyWeatherViewModel @Inject constructor(
             uiState.data.daily.mapIndexed { _, dailyWeather ->
                 with(dailyWeather) {
                     DailyWeatherUiState(
-                        time = dateFormat.format(time),
-                        temperatureMax = decimalFormat.format(temperatureMax).plus(DEG_C),
-                        temperatureMin = decimalFormat.format(temperatureMin).plus(DEG_C),
+                        time = time.weekdayDate(),
+                        temperatureMax = temperatureMax.degreesCelsius(),
+                        temperatureMin = temperatureMin.degreesCelsius(),
                         conditionText = conditionText,
                         conditionIcon = conditionIcon
                     )
@@ -88,13 +85,5 @@ class DailyWeatherViewModel @Inject constructor(
         locationProvider.lastLocation.addOnSuccessListener {
             _location.postValue(it)
         }
-    }
-
-    companion object {
-        private const val DEG_C = "°C"
-
-        @SuppressLint("SimpleDateFormat")
-        private val dateFormat = SimpleDateFormat("EEEE, d MMM")
-        private val decimalFormat = DecimalFormat("0.#")
     }
 }
