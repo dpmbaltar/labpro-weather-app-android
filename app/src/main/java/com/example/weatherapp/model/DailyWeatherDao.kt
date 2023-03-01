@@ -23,20 +23,15 @@ interface DailyWeatherDao {
 
     @Query(
         "SELECT * FROM DailyWeather " +
-        "WHERE locationId = :locationId AND time < :before AND timestamp = 0 " +
+        "WHERE locationId = :locationId AND time BETWEEN :from AND :to AND timestamp = 0 " +
         "ORDER BY time DESC LIMIT :limit"
     )
     fun getHistoricalDailyWeather(
         locationId: String,
-        before: Calendar,
+        from: Calendar,
+        to: Calendar,
         limit: Int = 7
     ): List<DailyWeather>
-
-    @Query(
-        "DELETE FROM DailyWeather " +
-        "WHERE locationId = :locationId AND timestamp BETWEEN 1 AND :timestamp - 1"
-    )
-    suspend fun deleteOld(locationId: String, timestamp: Calendar)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(dailyWeather: DailyWeather)
