@@ -10,6 +10,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlin.math.absoluteValue
 
 @Singleton
 @SuppressLint("MissingPermission")
@@ -52,6 +53,30 @@ class WeatherForecastRepository @Inject constructor(
 
         remoteWeather.fetchDailyWeather(latitude, longitude).let {
             localWeather.insertDailyWeather(it)
+            emit(it)
+        }
+    }
+
+    suspend fun getHistoricalDailyWeather(
+        latitude: Double,
+        longitude: Double,
+        date: Calendar,
+        days: Int
+    ): Flow <DailyWeatherResponse> = flow {
+        localWeather.getWeatherLocation(latitude, longitude)?.let { location ->
+            localWeather.getHistoricalDailyWeather(latitude, longitude, date, days).let { daily ->
+                // TODO: get local historical daily weather
+                /*if (daily.isNotEmpty()) {
+                    emit(DailyWeatherResponse(location, daily))
+                    if (daily.size < days.absoluteValue) {
+
+                    }
+                }*/
+            }
+        }
+
+        remoteWeather.fetchHistoricalDailyWeather(latitude, longitude, date, days).let {
+            //localWeather.insertHistoricalDailyWeather(it)
             emit(it)
         }
     }

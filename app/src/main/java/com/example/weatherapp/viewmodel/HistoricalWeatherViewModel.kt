@@ -2,14 +2,17 @@ package com.example.weatherapp.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.paging.Pager
-import androidx.paging.PagingConfig
-import androidx.paging.cachedIn
+import androidx.paging.*
 import com.example.weatherapp.model.HistoricalWeatherPagingSource
 import com.example.weatherapp.model.PAGE_SIZE
 import com.example.weatherapp.model.WeatherForecastRepository
+import com.example.weatherapp.util.degreesCelsius
+import com.example.weatherapp.util.weatherIcon
+import com.example.weatherapp.util.weekdayDateMonth
 import com.google.android.gms.location.FusedLocationProviderClient
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 @HiltViewModel
@@ -18,7 +21,27 @@ class HistoricalWeatherViewModel @Inject constructor(
     private val locationProviderClient: FusedLocationProviderClient
 ) : ViewModel() {
 
-    val daily = Pager(PagingConfig(pageSize = PAGE_SIZE)) {
+    data class DailyWeatherUiState(
+        val time: String,
+        val temperatureMax: String,
+        val temperatureMin: String,
+        val conditionText: String,
+        val conditionIcon: Int
+    )
+
+    val daily: Flow<PagingData<DailyWeatherUiState>> = Pager(PagingConfig(pageSize = PAGE_SIZE)) {
         HistoricalWeatherPagingSource(weatherRepository, locationProviderClient)
-    }.flow.cachedIn(viewModelScope)
+    }.flow.map { pagingData ->
+        pagingData.map { dailyWeather ->
+            with(dailyWeather) {
+                DailyWeatherUiState(
+                    time = time.weekdayDateMonth(),
+                    temperatureMax = temperatureMax.degreesCelsius(),
+                    temperatureMin = temperatureMin.degreesCelsius(),
+                    conditionIcon = conditionIcon.weatherIcon(),
+                    conditionText = conditionText
+                )
+            }
+        }
+    }.cachedIn(viewModelScope)
 }

@@ -5,37 +5,12 @@ import android.view.ViewGroup
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import com.example.weatherapp.adapter.HistoricalWeatherPagingDataAdapter.DailyWeatherViewHolder
 import com.example.weatherapp.databinding.DailyWeatherItemBinding
-import com.example.weatherapp.model.DailyWeather
-import com.example.weatherapp.util.WeatherIcon
-
-val USER_COMPARATOR = object : DiffUtil.ItemCallback<DailyWeather>() {
-    override fun areItemsTheSame(oldItem: DailyWeather, newItem: DailyWeather): Boolean =
-        oldItem.time.time == newItem.time.time
-
-    override fun areContentsTheSame(oldItem: DailyWeather, newItem: DailyWeather): Boolean =
-        oldItem == newItem
-}
-
-class DailyWeatherViewHolder(
-    private var binding: DailyWeatherItemBinding
-) : RecyclerView.ViewHolder(binding.root) {
-
-    fun bind(weather: DailyWeather?) {
-        weather?.let {
-            with(binding) {
-                date.text = weather.time.toString()
-                temperatureMax.text = weather.temperatureMax.toString()
-                temperatureMin.text = weather.temperatureMin.toString()
-                conditionText.text = weather.conditionText
-                conditionIcon.setImageResource(WeatherIcon.getDrawableId(weather.conditionIcon))
-            }
-        }
-    }
-}
+import com.example.weatherapp.viewmodel.HistoricalWeatherViewModel.DailyWeatherUiState
 
 class HistoricalWeatherPagingDataAdapter :
-    PagingDataAdapter<DailyWeather, DailyWeatherViewHolder>(USER_COMPARATOR) {
+    PagingDataAdapter<DailyWeatherUiState, DailyWeatherViewHolder>(DiffCallback) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DailyWeatherViewHolder {
         return DailyWeatherViewHolder(
@@ -47,5 +22,37 @@ class HistoricalWeatherPagingDataAdapter :
         // Note that item may be null, ViewHolder must support binding null item as placeholder
         val repoItem = getItem(position)
         holder.bind(repoItem)
+    }
+
+    class DailyWeatherViewHolder(
+        private val binding: DailyWeatherItemBinding
+    ) : RecyclerView.ViewHolder(binding.root) {
+
+        fun bind(dailyWeather: DailyWeatherUiState?) {
+            dailyWeather?.let {
+                with(dailyWeather) {
+                    binding.date.text = time
+                    binding.temperatureMax.text = temperatureMax
+                    binding.temperatureMin.text = temperatureMin
+                    binding.conditionText.text = conditionText
+                    binding.conditionIcon.setImageResource(conditionIcon)
+                }
+            }
+        }
+    }
+
+    companion object {
+        private val DiffCallback = object : DiffUtil.ItemCallback<DailyWeatherUiState>() {
+
+            override fun areItemsTheSame(
+                oldItem: DailyWeatherUiState,
+                newItem: DailyWeatherUiState
+            ): Boolean = oldItem.time == newItem.time
+
+            override fun areContentsTheSame(
+                oldItem: DailyWeatherUiState,
+                newItem: DailyWeatherUiState
+            ): Boolean = oldItem == newItem
+        }
     }
 }

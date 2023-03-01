@@ -5,6 +5,7 @@ import android.location.Location
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.google.android.gms.location.FusedLocationProviderClient
+import kotlinx.coroutines.flow.single
 import java.util.*
 import javax.inject.Inject
 
@@ -16,7 +17,6 @@ class HistoricalWeatherPagingSource @Inject constructor(
     locationProvider: FusedLocationProviderClient
 ) : PagingSource<Int, DailyWeather>() {
 
-    private val today: Calendar = Calendar.getInstance()
     private var _location: Location? = null
     private val location get() = _location!!
 
@@ -27,16 +27,18 @@ class HistoricalWeatherPagingSource @Inject constructor(
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, DailyWeather> {
         return try {
             val nextPage = params.key ?: 1
+            val today: Calendar = Calendar.getInstance()
             val date = today.apply { add(Calendar.DATE, -PAGE_SIZE.times(nextPage)) }
-            val response = weatherRepository.getHistorical(
+
+            val response = weatherRepository.getHistoricalDailyWeather(
                 location.latitude,
                 location.longitude,
-                date.time,
+                date,
                 -PAGE_SIZE
-            )
+            ).single()
 
             LoadResult.Page(
-                data = response.body()!!.daily,
+                data = response.daily,
                 prevKey = null,
                 nextKey = nextPage.plus(1)
             )
