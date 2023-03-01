@@ -5,6 +5,7 @@ import com.example.weatherapp.model.WeatherLocation.Companion.buildId
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import java.util.*
+import java.util.Calendar.DATE
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -16,7 +17,6 @@ class WeatherForecastLocalDataSource @Inject constructor(
     @IoDispatcher private val coroutineDispatcher: CoroutineDispatcher
 ) {
 
-    // TODO: local data source
     suspend fun getWeatherLocation(latitude: Double, longitude: Double): WeatherLocation? =
         withContext(coroutineDispatcher) {
             locationDao.getWeatherLocation(buildId(latitude, longitude))
@@ -25,11 +25,6 @@ class WeatherForecastLocalDataSource @Inject constructor(
     suspend fun getCurrentWeather(latitude: Double, longitude: Double): CurrentWeather? =
         withContext(coroutineDispatcher) {
             currentWeatherDao.getCurrentWeather(buildId(latitude, longitude))
-        }
-
-    suspend fun getCurrentWeather(weatherLocation: WeatherLocation): CurrentWeather? =
-        withContext(coroutineDispatcher) {
-            currentWeatherDao.getCurrentWeather(weatherLocation.locationId())
         }
 
     suspend fun insertCurrentWeather(currentWeatherResponse: CurrentWeatherResponse) =
@@ -44,25 +39,23 @@ class WeatherForecastLocalDataSource @Inject constructor(
             }
         }
 
-    suspend fun getDailyWeather(weatherLocation: WeatherLocation): List<DailyWeather> =
+    suspend fun getDailyWeather(latitude: Double, longitude: Double): List<DailyWeather> =
         withContext(coroutineDispatcher) {
-            dailyWeatherDao.getDailyWeather(weatherLocation.locationId())
+            dailyWeatherDao.getDailyWeather(buildId(latitude, longitude))
         }
 
     suspend fun insertDailyWeather(dailyWeatherResponse: DailyWeatherResponse) =
         withContext(coroutineDispatcher) {
             with(dailyWeatherResponse) {
-                val currentTime = Calendar.getInstance()
-                val locationId = location.locationId()
-
-                location.copy(id = locationId).let { locationDao.insert(it) }
-                //dailyWeatherDao.deleteOld(locationId, currentTime.apply { add(HOUR, -1) })
-                daily.forEach { dailyWeather ->
-                    dailyWeather.copy(
-                        locationId = locationId,
-                        timestamp = Calendar.getInstance()
-                    ).let {
-                        dailyWeatherDao.insert(it)
+                location.locationId().let { locationId ->
+                    location.copy(id = locationId).let { locationDao.insert(it) }
+                    daily.forEach { dailyWeather ->
+                        dailyWeather.copy(
+                            locationId = locationId,
+                            timestamp = Calendar.getInstance()
+                        ).let {
+                            dailyWeatherDao.insert(it)
+                        }
                     }
                 }
             }
@@ -75,7 +68,14 @@ class WeatherForecastLocalDataSource @Inject constructor(
         days: Int
     ): List<DailyWeather> =
         withContext(coroutineDispatcher) {
-            dailyWeatherDao.getHistoricalDailyWeather(buildId(latitude, longitude), date, days)
+            val offset = Calendar.getInstance().apply {
+                timeInMillis = date.timeInMillis
+                add(DATE, days)
+            }
+            val from = if (days > 0) date else offset
+            val to = if (days > 0) offset else date
+
+            dailyWeatherDao.getHistoricalDailyWeather(buildId(latitude, longitude), from, to)
         }
 
     suspend fun insertHistoricalDailyWeather(dailyWeatherResponse: DailyWeatherResponse) =
