@@ -13,6 +13,9 @@ const val KILOMETER_PER_HOUR = "km/h"
 private val decimalFormat = DecimalFormat("0.#")
 
 @SuppressLint("SimpleDateFormat")
+private val isoDateFormat = SimpleDateFormat("yyyy-MM-dd")
+
+@SuppressLint("SimpleDateFormat")
 private val weekdayDateMonthFormat = SimpleDateFormat("EEEE, d MMM")
 
 @SuppressLint("SimpleDateFormat")
@@ -34,7 +37,14 @@ fun Int.decimal(): String = decimalFormat.format(this)
 fun Int.percent(): String = this.decimal().percent()
 fun Int.degreesCelsius(): String = this.decimal().degreesCelsius()
 fun Int.kilometersPerHour(): String = this.decimal().kilometersPerHour()
+fun Int.weatherIcon(): Int = WeatherIcon.getDrawableId(this)
 
+fun Calendar.isoDate(): String = this.time.isoDate()
+fun Calendar.weekdayDateMonth(): String = this.time.weekdayDateMonth()
+fun Calendar.weekdayDate(): String = this.time.weekdayDate()
+fun Calendar.hourMinutes(): String = this.time.hourMinutes()
+
+fun Date.isoDate(): String = isoDateFormat.format(this)
 fun Date.weekdayDateMonth(): String = weekdayDateMonthFormat.format(this)
 fun Date.weekdayDate(): String = weekdayDateFormat.format(this)
 fun Date.hourMinutes(): String = hourMinutesFormat.format(this)
