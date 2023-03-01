@@ -7,6 +7,7 @@ import androidx.paging.PagingState
 import com.google.android.gms.location.FusedLocationProviderClient
 import kotlinx.coroutines.flow.single
 import java.util.*
+import java.util.Calendar.*
 import javax.inject.Inject
 
 const val PAGE_SIZE = 7
@@ -27,8 +28,13 @@ class HistoricalWeatherPagingSource @Inject constructor(
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, DailyWeather> {
         return try {
             val nextPage = params.key ?: 1
-            val today: Calendar = Calendar.getInstance()
-            val date = today.apply { add(Calendar.DATE, -PAGE_SIZE.times(nextPage)) }
+            val date = getInstance().apply {
+                set(HOUR_OF_DAY, 0)
+                set(MINUTE, 0)
+                set(SECOND, 0)
+                set(MILLISECOND, 0)
+                add(DATE, -PAGE_SIZE.times(nextPage))
+            }
 
             val response = weatherRepository.getHistoricalDailyWeather(
                 location.latitude,
