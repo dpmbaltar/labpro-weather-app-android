@@ -15,7 +15,6 @@ import com.example.weatherapp.adapter.HistoricalWeatherPagingDataAdapter
 import com.example.weatherapp.databinding.FragmentHistoricalWeatherBinding
 import com.example.weatherapp.viewmodel.HistoricalWeatherViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
@@ -75,7 +74,7 @@ class HistoricalWeatherFragment : Fragment() {
         }
 
         lifecycleScope.launch {
-            viewModel.daily.collectLatest { pagingData ->
+            viewModel.daily.collect { pagingData ->
                 pagingAdapter.submitData(pagingData)
             }
         }
