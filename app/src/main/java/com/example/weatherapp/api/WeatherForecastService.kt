@@ -42,6 +42,7 @@ interface WeatherForecastService {
         @Query("longitude") longitude: Double,
         @Query("date") date: String,
         @Query("days") days: Int,
+        @Query("withLocation") withLocation: Boolean = true
     ): Response<DailyWeatherResponse>
 
     companion object {
