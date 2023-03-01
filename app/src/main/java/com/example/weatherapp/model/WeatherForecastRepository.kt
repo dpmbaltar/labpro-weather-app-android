@@ -6,7 +6,6 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import retrofit2.Response
-import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -25,7 +24,7 @@ class WeatherForecastRepository @Inject constructor(
         longitude: Double
     ): Flow<CurrentWeatherResponse> = flow {
         localWeather.getWeatherLocation(latitude, longitude)?.let { location ->
-            localWeather.getCurrentWeather(location)?.let { current ->
+            localWeather.getCurrentWeather(latitude, longitude)?.let { current ->
                 emit(CurrentWeatherResponse(location, current))
                 if (!current.isOld()) return@flow
             }
@@ -42,7 +41,7 @@ class WeatherForecastRepository @Inject constructor(
         longitude: Double
     ): Flow<DailyWeatherResponse> = flow {
         localWeather.getWeatherLocation(latitude, longitude)?.let { location ->
-            localWeather.getDailyWeather(location).let { daily ->
+            localWeather.getDailyWeather(latitude, longitude).let { daily ->
                 if (daily.isNotEmpty()) {
                     emit(DailyWeatherResponse(location, daily))
                     if (daily.first().isOld().not())
@@ -65,18 +64,15 @@ class WeatherForecastRepository @Inject constructor(
     ): Flow <DailyWeatherResponse> = flow {
         localWeather.getWeatherLocation(latitude, longitude)?.let { location ->
             localWeather.getHistoricalDailyWeather(latitude, longitude, date, days).let { daily ->
-                // TODO: get local historical daily weather
-                /*if (daily.isNotEmpty()) {
+                if (daily.size == days.absoluteValue) {
                     emit(DailyWeatherResponse(location, daily))
-                    if (daily.size < days.absoluteValue) {
-
-                    }
-                }*/
+                    return@flow
+                }
             }
         }
 
         remoteWeather.fetchHistoricalDailyWeather(latitude, longitude, date, days).let {
-            //localWeather.insertHistoricalDailyWeather(it)
+            localWeather.insertHistoricalDailyWeather(it)
             emit(it)
         }
     }
@@ -95,24 +91,7 @@ class WeatherForecastRepository @Inject constructor(
         )
     }
 
-    suspend fun getHistorical(
-        latitude: Double,
-        longitude: Double,
-        date: Date,
-        days: Int = -7
-    ): Response<DailyWeatherResponse> {
-        return weatherService.historical(
-            latitude,
-            longitude,
-            dateFormat.format(date),
-            days.coerceAtLeast(-7).coerceAtMost(7)
-        )
-    }
-
     companion object {
-
-        @SuppressLint("SimpleDateFormat")
-        private val dateFormat = SimpleDateFormat("yyyy-MM-dd")
 
         @Volatile
         private var instance: WeatherForecastRepository? = null
