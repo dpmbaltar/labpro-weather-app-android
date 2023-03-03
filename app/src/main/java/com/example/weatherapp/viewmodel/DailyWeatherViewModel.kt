@@ -39,8 +39,13 @@ class DailyWeatherViewModel @Inject constructor(
         val time: String,
         val temperatureMax: String,
         val temperatureMin: String,
+        val sunrise: String,
+        val sunset: String,
         val conditionText: String,
-        val conditionIcon: Int
+        val conditionIcon: Int,
+        val date: String,
+        val latitude: Double,
+        val longitude: Double
     )
 
     private val _uiState = MutableStateFlow<UiState>(UiState.Loading)
@@ -57,8 +62,13 @@ class DailyWeatherViewModel @Inject constructor(
                         time = time.weekdayDate(),
                         temperatureMax = temperatureMax.degreesCelsius(),
                         temperatureMin = temperatureMin.degreesCelsius(),
+                        sunrise = sunrise,
+                        sunset = sunset,
                         conditionText = conditionText,
-                        conditionIcon = conditionIcon
+                        conditionIcon = conditionIcon,
+                        date = time.isoDate(),
+                        latitude = uiState.data.location.latitude,
+                        longitude = uiState.data.location.longitude
                     )
                 }
             }

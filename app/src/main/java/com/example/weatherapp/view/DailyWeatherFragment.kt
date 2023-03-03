@@ -20,6 +20,7 @@ import com.example.weatherapp.util.ConnectionException
 import com.example.weatherapp.util.RemoteResponseException
 import com.example.weatherapp.viewmodel.DailyWeatherViewModel
 import com.example.weatherapp.viewmodel.DailyWeatherViewModel.DailyWeatherUiState
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
@@ -53,11 +54,12 @@ class DailyWeatherFragment : Fragment() {
         _binding = FragmentDailyWeatherBinding.inflate(inflater, container, false)
         val view = binding.root
 
-        dailyWeatherAdapter = DailyWeatherAdapter { _, _ ->
-            val bottomSheet = BottomSheetDialog(requireContext())
-            bottomSheet.setContentView(R.layout.loading_item)
-            bottomSheet.show()
-            // TODO: use BottomSheet for HourlyWeather
+        dailyWeatherAdapter = DailyWeatherAdapter { dailyWeather, position ->
+            val contentView = with(dailyWeather) {
+                HourlyWeatherFragment.newInstance(latitude, longitude, date, sunrise, sunset)
+            }
+
+            activity?.supportFragmentManager?.let { contentView.show(it, contentView.tag) }
         }
 
         recyclerView = binding.dailyWeather
