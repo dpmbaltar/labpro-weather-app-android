@@ -10,24 +10,12 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import java.util.*
 import javax.inject.Inject
+import com.example.weatherapp.util.Result as FlowResult
 
 @HiltViewModel
 class HourlyWeatherViewModel @Inject constructor(
     private val weatherRepository: WeatherForecastRepository
 ) : ViewModel() {
-
-    private sealed interface UiState {
-
-        object Loading : UiState
-
-        data class Success(
-            val data: List<HourlyWeather>
-        ) : UiState
-
-        data class Error(
-            val throwable: Throwable? = null
-        ) : UiState
-    }
 
     data class HourlyWeatherUiModel(
         val time: String,
@@ -38,12 +26,12 @@ class HourlyWeatherViewModel @Inject constructor(
         val conditionIcon: Int
     )
 
-    private val _uiState = MutableStateFlow<UiState>(UiState.Loading)
+    private val _uiState = MutableStateFlow<FlowResult<List<HourlyWeather>>>(FlowResult.Loading)
 
-    val error: Flow<Throwable?> = _uiState.filterIsInstance<UiState.Error>().map { it.throwable }
-    val loading: Flow<Boolean> = _uiState.map { it is UiState.Loading }
+    val error: Flow<Throwable?> = _uiState.filterIsInstance<FlowResult.Error>().map { it.exception }
+    val loading: Flow<Boolean> = _uiState.map { it is FlowResult.Loading }
     val hourlyWeather: Flow<List<HourlyWeatherUiModel>> = _uiState
-        .filterIsInstance<UiState.Success>()
+        .filterIsInstance<FlowResult.Success<List<HourlyWeather>>>()
         .map { uiState ->
             uiState.data.mapIndexed { _, hourlyWeather ->
                 with(hourlyWeather) {
@@ -61,15 +49,10 @@ class HourlyWeatherViewModel @Inject constructor(
 
     fun loadHourlyWeather(latitude: Double, longitude: Double, date: Calendar) =
         viewModelScope.launch {
-            weatherRepository.getHourlyWeather(latitude, longitude, date).asResult()
+            weatherRepository.getHourlyWeather(latitude, longitude, date)
+                .asResult()
                 .collect { result ->
-                    _uiState.update {
-                        when (result) {
-                            is Result.Loading -> UiState.Loading
-                            is Result.Success -> UiState.Success(result.data)
-                            is Result.Error -> UiState.Error(result.exception)
-                        }
-                    }
+                    _uiState.update { result }
                 }
         }
 }
