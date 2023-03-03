@@ -102,7 +102,7 @@ class HourlyWeatherFragment : BottomSheetDialogFragment() {
                 binding.date.text = date
                 binding.sunrise.text = sunrise
                 binding.sunset.text = sunset
-                Log.d(HourlyWeatherFragment::class.java.simpleName, e.message, e)
+                Log.d(TAG, e.message, e)
             }
 
             refreshView = binding.swipeRefresh.apply {
@@ -124,8 +124,8 @@ class HourlyWeatherFragment : BottomSheetDialogFragment() {
             }
         }
 
-        lifecycleScope.launch { viewModel.error.collect { showError(it) } }
         lifecycleScope.launch { viewModel.loading.collect { showLoading(it) } }
+        lifecycleScope.launch { viewModel.error.collect { showError(it) } }
 
         return view
     }
