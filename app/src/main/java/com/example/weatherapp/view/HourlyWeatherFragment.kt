@@ -64,7 +64,7 @@ class HourlyWeatherFragment : BottomSheetDialogFragment() {
             val date = it.getString(DATE_NAME)!!.isoDate()
 
             lifecycleScope.launch {
-                viewModel.loadHourlyWeather(
+                viewModel.refresh(
                     latitude,
                     longitude,
                     Calendar.getInstance().apply { time = date }
@@ -108,7 +108,7 @@ class HourlyWeatherFragment : BottomSheetDialogFragment() {
             refreshView = binding.swipeRefresh.apply {
                 setOnRefreshListener {
                     lifecycleScope.launch {
-                        viewModel.loadHourlyWeather(
+                        viewModel.refresh(
                             latitude,
                             longitude,
                             Calendar.getInstance().apply { time = date!!.isoDate() }

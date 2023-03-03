@@ -47,7 +47,7 @@ class HourlyWeatherViewModel @Inject constructor(
             }
         }
 
-    fun loadHourlyWeather(latitude: Double, longitude: Double, date: Calendar) =
+    fun refresh(latitude: Double, longitude: Double, date: Calendar) =
         viewModelScope.launch {
             weatherRepository.getHourlyWeather(latitude, longitude, date)
                 .asResult()
