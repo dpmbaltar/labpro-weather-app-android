@@ -1,63 +1,75 @@
 package com.example.weatherapp.viewmodel
 
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.weatherapp.model.HourlyWeather
 import com.example.weatherapp.model.WeatherForecastRepository
-import com.example.weatherapp.model.WeatherLocation
+import com.example.weatherapp.util.*
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import java.io.IOException
-import java.text.ParseException
-import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
 
 @HiltViewModel
 class HourlyWeatherViewModel @Inject constructor(
-    private val weatherForecastRepository: WeatherForecastRepository
+    private val weatherRepository: WeatherForecastRepository
 ) : ViewModel() {
 
-    val location = MutableLiveData<WeatherLocation>()
-    val hourly = MutableLiveData<List<HourlyWeather>>()
-    val error = MutableLiveData<String>()
+    private sealed interface UiState {
 
-    fun fetchHourlyWeather(lat: Double, lon: Double, date: Calendar) {
-        GlobalScope.launch(Dispatchers.IO) { loadHourlyWeather(lat, lon, date) }
+        object Loading : UiState
+
+        data class Success(
+            val data: List<HourlyWeather>
+        ) : UiState
+
+        data class Error(
+            val throwable: Throwable? = null
+        ) : UiState
     }
 
-    private suspend fun loadHourlyWeather(lat: Double, lon: Double, date: Calendar) {
-        try {
-            val response = weatherForecastRepository.getHourly(lat, lon, date)
-            if (response.isSuccessful) {
-                response.body()?.let {
-                    val hourlyValues = it.hourly[0]
-                    val hourlyItems = arrayListOf<HourlyWeather>()
+    data class HourlyWeatherUiModel(
+        val time: String,
+        val temperature: String,
+        val precipitation: String,
+        val windSpeed: String,
+        val conditionText: String,
+        val conditionIcon: Int
+    )
 
-                    for (i in 0..23) {
-                        hourlyItems.add(
-                            HourlyWeather(
-                                time = hourlyValues.time[i],
-                                temperature = hourlyValues.temperature[i],
-                                precipitation = hourlyValues.precipitation[i],
-                                windSpeed = hourlyValues.windSpeed[i],
-                                conditionIcon = hourlyValues.conditionIcon[i]
-                            )
-                        )
-                    }
+    private val _uiState = MutableStateFlow<UiState>(UiState.Loading)
 
-                    hourly.postValue(hourlyItems)
-                    location.postValue(it.location)
-                }
-            } else {
-                response.errorBody()?.let {
-                    error.postValue(it.string()) // TODO: Handle remote errors
+    val error: Flow<Throwable?> = _uiState.filterIsInstance<UiState.Error>().map { it.throwable }
+    val loading: Flow<Boolean> = _uiState.map { it is UiState.Loading }
+    val hourlyWeather: Flow<List<HourlyWeatherUiModel>> = _uiState
+        .filterIsInstance<UiState.Success>()
+        .map { uiState ->
+            uiState.data.mapIndexed { _, hourlyWeather ->
+                with(hourlyWeather) {
+                    HourlyWeatherUiModel(
+                        time = time.hourMinutes(),
+                        temperature = temperature.degreesCelsius(),
+                        precipitation = precipitation.percent(),
+                        windSpeed = windSpeed.kilometersPerHour(),
+                        conditionIcon = conditionIcon.weatherIcon(),
+                        conditionText = conditionText
+                    )
                 }
             }
-        } catch (e: IOException) {
-            error.postValue(e.localizedMessage) // TODO: Handle exceptions
         }
-    }
+
+    fun loadHourlyWeather(latitude: Double, longitude: Double, date: Calendar) =
+        viewModelScope.launch {
+            weatherRepository.getHourlyWeather(latitude, longitude, date).asResult()
+                .collect { result ->
+                    _uiState.update {
+                        when (result) {
+                            is Result.Loading -> UiState.Loading
+                            is Result.Success -> UiState.Success(result.data)
+                            is Result.Error -> UiState.Error(result.exception)
+                        }
+                    }
+                }
+        }
 }

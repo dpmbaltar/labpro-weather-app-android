@@ -16,6 +16,9 @@ private val decimalFormat = DecimalFormat("0.#")
 private val isoDateFormat = SimpleDateFormat("yyyy-MM-dd")
 
 @SuppressLint("SimpleDateFormat")
+private val isoDateTimeSimpleFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm")
+
+@SuppressLint("SimpleDateFormat")
 private val weekdayDateMonthFormat = SimpleDateFormat("EEEE, d MMM")
 
 @SuppressLint("SimpleDateFormat")
@@ -27,6 +30,8 @@ private val hourMinutesFormat = SimpleDateFormat("HH:mm")
 fun String.percent(): String = this.plus(SPACE).plus(PERCENT)
 fun String.degreesCelsius(): String = this.plus(SPACE).plus(DEGREE_CELSIUS)
 fun String.kilometersPerHour(): String = this.plus(SPACE).plus(KILOMETER_PER_HOUR)
+fun String.isoDate(): Date = isoDateFormat.parse(this)!!
+fun String.isoDateTimeSimple(): Date = isoDateTimeSimpleFormat.parse(this)!!
 
 fun Double.decimal(): String = decimalFormat.format(this)
 fun Double.percent(): String = this.decimal().percent()

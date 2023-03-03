@@ -1,31 +1,51 @@
 package com.example.weatherapp.view
 
-import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.findNavController
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.weatherapp.adapter.HourlyWeatherAdapter
 import com.example.weatherapp.databinding.FragmentHourlyWeatherBinding
+import com.example.weatherapp.util.hourMinutes
+import com.example.weatherapp.util.isoDate
+import com.example.weatherapp.util.isoDateTimeSimple
+import com.example.weatherapp.util.weekdayDate
 import com.example.weatherapp.viewmodel.HourlyWeatherViewModel
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
-import java.text.SimpleDateFormat
+import kotlinx.coroutines.launch
 import java.util.*
 
 @AndroidEntryPoint
-class HourlyWeatherFragment : Fragment() {
+class HourlyWeatherFragment : BottomSheetDialogFragment() {
 
     companion object {
+
         const val LATITUDE_NAME = "latitude"
         const val LONGITUDE_NAME = "longitude"
         const val DATE_NAME = "date"
         const val SUNRISE_NAME = "sunrise"
         const val SUNSET_NAME = "sunset"
+
+        fun newInstance(
+            latitude: Double,
+            longitude: Double,
+            date: String,
+            sunrise: String,
+            sunset: String
+        ) = HourlyWeatherFragment().apply {
+            arguments = Bundle().apply {
+                putDouble(LATITUDE_NAME, latitude)
+                putDouble(LONGITUDE_NAME, longitude)
+                putString(DATE_NAME, date)
+                putString(SUNRISE_NAME, sunrise)
+                putString(SUNSET_NAME, sunset)
+            }
+        }
     }
 
     private lateinit var viewModel: HourlyWeatherViewModel
@@ -36,68 +56,62 @@ class HourlyWeatherFragment : Fragment() {
         super.onCreate(savedInstanceState)
         viewModel = ViewModelProvider(this)[HourlyWeatherViewModel::class.java]
         arguments?.let {
-            val latitude = it.getFloat(LATITUDE_NAME)
-            val longitude = it.getFloat(LONGITUDE_NAME)
-            val today = Calendar.getInstance()
-            viewModel.fetchHourlyWeather(latitude.toDouble(), longitude.toDouble(), today)
+            val latitude = it.getDouble(LATITUDE_NAME)
+            val longitude = it.getDouble(LONGITUDE_NAME)
+            val date = it.getString(DATE_NAME)!!.isoDate()
+
+            lifecycleScope.launch {
+                viewModel.loadHourlyWeather(
+                    latitude,
+                    longitude,
+                    Calendar.getInstance().apply { time = date }
+                )
+            }
         }
     }
 
-    @SuppressLint("SimpleDateFormat")
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentHourlyWeatherBinding.inflate(inflater, container, false)
         val view = binding.root
         val hourlyWeatherAdapter = HourlyWeatherAdapter()
-        val recyclerView = binding.hourlyWeather
-        recyclerView.layoutManager = LinearLayoutManager(requireContext())
-        recyclerView.adapter = hourlyWeatherAdapter
 
-        val dateFormat = SimpleDateFormat()
-        val formats = arrayOf(
-            "yyyy-MM-dd",
-            "EEEE d",
-            "yyyy-MM-dd'T'HH:mm",
-            "HH:mm"
-        )
+        binding.hourlyWeather.apply {
+            layoutManager = LinearLayoutManager(requireContext())
+            adapter = hourlyWeatherAdapter
+        }
 
         arguments?.let { args ->
-            val time = args.getString(DATE_NAME)
+            val date = args.getString(DATE_NAME)
             val sunrise = args.getString(SUNRISE_NAME)
             val sunset = args.getString(SUNSET_NAME)
-            var date: Date?
 
             try {
-                dateFormat.applyLocalizedPattern(formats[0])
-                date = dateFormat.parse(time)
-                dateFormat.applyLocalizedPattern(formats[1])
-                binding.date.text = dateFormat.format(date)
-
-                dateFormat.applyLocalizedPattern(formats[2])
-                date = dateFormat.parse(sunrise)
-                dateFormat.applyLocalizedPattern(formats[3])
-                binding.sunrise.text = dateFormat.format(date)
-
-                dateFormat.applyLocalizedPattern(formats[2])
-                date = dateFormat.parse(sunset)
-                dateFormat.applyLocalizedPattern(formats[3])
-                binding.sunset.text = dateFormat.format(date)
+                binding.date.text = date!!.isoDate().weekdayDate()
+                binding.sunrise.text = sunrise!!.isoDateTimeSimple().hourMinutes()
+                binding.sunset.text = sunset!!.isoDateTimeSimple().hourMinutes()
             } catch (e: Exception) {
-                binding.date.text = time
+                binding.date.text = date
                 binding.sunrise.text = sunrise
                 binding.sunset.text = sunset
-                Log.d("HourlyWeatherFragment.onCreateView()", e.localizedMessage)
+                Log.d(HourlyWeatherFragment::class.java.simpleName, e.message, e)
             }
         }
 
-        viewModel.hourly.observe(viewLifecycleOwner) {
-            hourlyWeatherAdapter.submitList(it)
+        lifecycleScope.launch {
+            viewModel.hourlyWeather.collect {
+                hourlyWeatherAdapter.submitList(it)
+            }
         }
 
-        binding.backButton.setOnClickListener { view.findNavController().popBackStack() }
-
         return view
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }
