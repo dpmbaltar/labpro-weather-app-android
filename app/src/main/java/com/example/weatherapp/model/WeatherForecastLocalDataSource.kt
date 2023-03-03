@@ -66,22 +66,25 @@ class WeatherForecastLocalDataSource @Inject constructor(
         latitude: Double,
         longitude: Double,
         date: Date
-    ): List<HourlyWeather> =
-        withContext(coroutineDispatcher) {
-            hourlyWeatherDao.getHourlyWeather(date, buildId(latitude, longitude))
-        }
+    ): List<HourlyWeather> = withContext(coroutineDispatcher) {
+        hourlyWeatherDao.getHourlyWeather(date, buildId(latitude, longitude))
+    }
 
     suspend fun insertHourlyWeather(
-        weatherLocation: WeatherLocation,
-        dailyWeather: DailyWeather,
+        latitude: Double,
+        longitude: Double,
+        date: Date,
         hourlyWeather: HourlyWeather
-    ) =
-        withContext(coroutineDispatcher) {
-            hourlyWeather.copy(date = dailyWeather.time, locationId = weatherLocation.locationId())
-                .let {
-                    hourlyWeatherDao.insert(it)
-                }
-        }
+    ) = withContext(coroutineDispatcher) {
+        hourlyWeather.copy(date = date, locationId = buildId(latitude, longitude))
+            .let {
+                hourlyWeatherDao.insert(it)
+            }
+    }
+
+    suspend fun deleteHourlyWeather() = withContext(coroutineDispatcher) {
+        hourlyWeatherDao.deleteAll()
+    }
 
     suspend fun getHistoricalDailyWeather(
         latitude: Double,

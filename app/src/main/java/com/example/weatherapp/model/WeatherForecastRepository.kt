@@ -40,6 +40,8 @@ class WeatherForecastRepository @Inject constructor(
                     emit(DailyWeatherResponse(location, daily))
                     if (daily.first().isOld().not())
                         return@flow
+                    else
+                        localWeather.deleteHourlyWeather()
                 }
             }
         }
@@ -74,11 +76,19 @@ class WeatherForecastRepository @Inject constructor(
     suspend fun getHourlyWeather(
         latitude: Double,
         longitude: Double,
-        date: Calendar,
-
+        date: Calendar
         ): Flow<List<HourlyWeather>> = flow {
+        localWeather.getWeatherLocation(latitude, longitude)?.let {
+            localWeather.getHourlyWeather(latitude, longitude, date.time).let { daily ->
+                if (daily.isNotEmpty())
+                    return@flow emit(daily)
+            }
+        }
         remoteWeather.fetchHourlyWeather(latitude, longitude, date).let {
             emit(it)
+            it.forEach { hourlyWeather ->
+                localWeather.insertHourlyWeather(latitude, longitude, date.time, hourlyWeather)
+            }
         }
     }
 
