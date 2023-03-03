@@ -5,6 +5,7 @@ import com.google.gson.annotations.JsonAdapter
 import java.util.*
 
 @Entity(
+    primaryKeys = ["time", "locationId"],
     foreignKeys = [
         ForeignKey(
             entity = WeatherLocation::class,
@@ -16,7 +17,6 @@ import java.util.*
 )
 data class DailyWeather(
     @field:JsonAdapter(JsonAdapters.DateAdapter::class)
-    @PrimaryKey
     val time: Date,
     val temperatureMax: Double,
     val temperatureMin: Double,
@@ -31,7 +31,7 @@ data class DailyWeather(
     val windDirection: Double,
     val conditionText: String,
     val conditionIcon: Int,
-    val locationId: String? = null,
+    val locationId: String,
     val timestamp: Calendar = Calendar.getInstance()
 ) {
     fun isOld(): Boolean = Calendar.getInstance()

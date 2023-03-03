@@ -1,10 +1,7 @@
 package com.example.weatherapp.di
 
 import android.content.Context
-import com.example.weatherapp.model.CurrentWeatherDao
-import com.example.weatherapp.model.DailyWeatherDao
-import com.example.weatherapp.model.WeatherDatabase
-import com.example.weatherapp.model.WeatherLocationDao
+import com.example.weatherapp.model.*
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -12,8 +9,8 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
-@InstallIn(SingletonComponent::class)
 @Module
+@InstallIn(SingletonComponent::class)
 class DatabaseModule {
 
     @Singleton
@@ -32,4 +29,8 @@ class DatabaseModule {
     @Provides
     fun providesDailyWeatherDao(weatherDatabase: WeatherDatabase): DailyWeatherDao =
         weatherDatabase.dailyWeatherDao()
+
+    @Provides
+    fun providesHourlyWeatherDao(weatherDatabase: WeatherDatabase): HourlyWeatherDao =
+        weatherDatabase.hourlyWeatherDao()
 }
