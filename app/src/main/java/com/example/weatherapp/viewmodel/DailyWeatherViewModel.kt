@@ -65,7 +65,7 @@ class DailyWeatherViewModel @Inject constructor(
                         sunrise = sunrise,
                         sunset = sunset,
                         conditionText = conditionText,
-                        conditionIcon = conditionIcon,
+                        conditionIcon = conditionIcon.weatherIcon(),
                         date = time.isoDate(),
                         latitude = uiState.data.location.latitude,
                         longitude = uiState.data.location.longitude

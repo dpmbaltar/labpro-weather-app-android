@@ -7,7 +7,6 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.weatherapp.adapter.DailyWeatherAdapter.DailyWeatherViewHolder
 import com.example.weatherapp.databinding.DailyWeatherItemBinding
-import com.example.weatherapp.util.WeatherIcon
 import com.example.weatherapp.viewmodel.DailyWeatherViewModel.DailyWeatherUiState
 
 class DailyWeatherAdapter(
@@ -44,7 +43,7 @@ class DailyWeatherAdapter(
                 binding.temperatureMax.text = temperatureMax
                 binding.temperatureMin.text = temperatureMin
                 binding.conditionText.text = conditionText
-                binding.conditionIcon.setImageResource(WeatherIcon.getDrawableId(conditionIcon))
+                binding.conditionIcon.setImageResource(conditionIcon)
             }
         }
     }
