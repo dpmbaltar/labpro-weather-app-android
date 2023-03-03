@@ -39,7 +39,7 @@ class WeatherForecastRemoteDataSource @Inject constructor(
     suspend fun fetchDailyWeather(
         latitude: Double,
         longitude: Double
-    ): DailyWeatherResponse = try {
+    ): DailyWeatherResult = try {
         weatherService.daily(latitude, longitude).let { response ->
             if (response.isSuccessful) {
                 response.body()!!
@@ -100,7 +100,7 @@ class WeatherForecastRemoteDataSource @Inject constructor(
         longitude: Double,
         date: Calendar,
         days: Int
-    ): DailyWeatherResponse = try {
+    ): DailyWeatherResult = try {
         weatherService.historical(
             latitude,
             longitude,

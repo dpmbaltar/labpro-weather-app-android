@@ -1,8 +1,8 @@
 package com.example.weatherapp.api
 
 import com.example.weatherapp.model.CurrentWeatherResult
-import com.example.weatherapp.model.DailyWeatherResponse
-import com.example.weatherapp.model.HourlyWeatherResponse
+import com.example.weatherapp.model.DailyWeatherResult
+import com.example.weatherapp.model.HourlyWeatherResult
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import okhttp3.logging.HttpLoggingInterceptor.Level
@@ -25,7 +25,7 @@ interface WeatherForecastService {
     suspend fun daily(
         @Query("latitude") latitude: Double,
         @Query("longitude") longitude: Double
-    ): Response<DailyWeatherResponse>
+    ): Response<DailyWeatherResult>
 
     @GET("/api/weather/hourly/{year}/{month}/{day}")
     suspend fun hourly(
@@ -34,7 +34,7 @@ interface WeatherForecastService {
         @Path("day") day: Int,
         @Query("latitude") latitude: Double,
         @Query("longitude") longitude: Double,
-    ): Response<HourlyWeatherResponse>
+    ): Response<HourlyWeatherResult>
 
     @GET("/api/weather/historical")
     suspend fun historical(
@@ -43,7 +43,7 @@ interface WeatherForecastService {
         @Query("date") date: String,
         @Query("days") days: Int,
         @Query("withLocation") withLocation: Boolean = true
-    ): Response<DailyWeatherResponse>
+    ): Response<DailyWeatherResult>
 
     companion object {
         private const val BASE_URL = "http://192.168.0.239:9000/"

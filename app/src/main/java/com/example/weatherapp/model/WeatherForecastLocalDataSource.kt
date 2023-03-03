@@ -47,9 +47,9 @@ class WeatherForecastLocalDataSource @Inject constructor(
             dailyWeatherDao.getDailyWeather(buildId(latitude, longitude))
         }
 
-    suspend fun insertDailyWeather(dailyWeatherResponse: DailyWeatherResponse) =
+    suspend fun insertDailyWeather(dailyWeatherResult: DailyWeatherResult) =
         withContext(coroutineDispatcher) {
-            with(dailyWeatherResponse) {
+            with(dailyWeatherResult) {
                 location.locationId().let { locationId ->
                     location.copy(id = locationId).let { locationDao.insert(it) }
                     daily.forEach { dailyWeather ->
@@ -105,9 +105,9 @@ class WeatherForecastLocalDataSource @Inject constructor(
             dailyWeatherDao.getHistoricalDailyWeather(buildId(latitude, longitude), from, to)
         }
 
-    suspend fun insertHistoricalDailyWeather(dailyWeatherResponse: DailyWeatherResponse) =
+    suspend fun insertHistoricalDailyWeather(dailyWeatherResult: DailyWeatherResult) =
         withContext(coroutineDispatcher) {
-            with(dailyWeatherResponse) {
+            with(dailyWeatherResult) {
                 location.locationId().let { locationId ->
                     location.copy(id = locationId).let { locationDao.insert(it) }
                     daily.forEach { dailyWeather ->

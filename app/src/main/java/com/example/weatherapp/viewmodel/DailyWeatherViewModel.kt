@@ -36,14 +36,14 @@ class DailyWeatherViewModel @Inject constructor(
         val longitude: Double
     )
 
-    private val _uiState = MutableStateFlow<FlowResult<DailyWeatherResponse>>(FlowResult.Loading)
+    private val _uiState = MutableStateFlow<FlowResult<DailyWeatherResult>>(FlowResult.Loading)
     private val _location = MutableLiveData<Location>()
     private val location: Flow<Location> get() = _location.asFlow()
 
     val error: Flow<Throwable?> = _uiState.filterIsInstance<FlowResult.Error>().map { it.exception }
     val loading: Flow<Boolean> = _uiState.map { it is FlowResult.Loading }
     val dailyWeather: Flow<List<DailyWeatherUiModel>> = _uiState
-        .filterIsInstance<FlowResult.Success<DailyWeatherResponse>>()
+        .filterIsInstance<FlowResult.Success<DailyWeatherResult>>()
         .map { uiState ->
             uiState.data.daily.mapIndexed { _, dailyWeather ->
                 with(dailyWeather) {

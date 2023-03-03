@@ -33,11 +33,11 @@ class WeatherForecastRepository @Inject constructor(
     suspend fun getDailyWeather(
         latitude: Double,
         longitude: Double
-    ): Flow<DailyWeatherResponse> = flow {
+    ): Flow<DailyWeatherResult> = flow {
         localWeather.getWeatherLocation(latitude, longitude)?.let { location ->
             localWeather.getDailyWeather(latitude, longitude).let { daily ->
                 if (daily.isNotEmpty()) {
-                    emit(DailyWeatherResponse(location, daily))
+                    emit(DailyWeatherResult(location, daily))
                     if (daily.first().isOld().not())
                         return@flow
                     else
@@ -57,11 +57,11 @@ class WeatherForecastRepository @Inject constructor(
         longitude: Double,
         date: Calendar,
         days: Int
-    ): Flow<DailyWeatherResponse> = flow {
+    ): Flow<DailyWeatherResult> = flow {
         localWeather.getWeatherLocation(latitude, longitude)?.let { location ->
             localWeather.getHistoricalDailyWeather(latitude, longitude, date, days).let { daily ->
                 if (daily.size == days.absoluteValue) {
-                    emit(DailyWeatherResponse(location, daily))
+                    emit(DailyWeatherResult(location, daily))
                     return@flow
                 }
             }
