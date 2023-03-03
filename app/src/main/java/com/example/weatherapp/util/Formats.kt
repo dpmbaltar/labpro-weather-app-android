@@ -50,6 +50,7 @@ fun Calendar.weekdayDate(): String = this.time.weekdayDate()
 fun Calendar.hourMinutes(): String = this.time.hourMinutes()
 
 fun Date.isoDate(): String = isoDateFormat.format(this)
+fun Date.isoDateTimeSimple(): String = isoDateTimeSimpleFormat.format(this)
 fun Date.weekdayDateMonth(): String = weekdayDateMonthFormat.format(this)
 fun Date.weekdayDate(): String = weekdayDateFormat.format(this)
 fun Date.hourMinutes(): String = hourMinutesFormat.format(this)
