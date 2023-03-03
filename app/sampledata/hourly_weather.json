@@ -3,15 +3,15 @@
   "data": [
     {
       "time": "00:00",
-      "conditionText": "Soleado",
+      "conditionText": "Generalmente soleado",
       "temperature": "32,8 °C",
       "apparentTemperature": "34,6 °C",
-      "precipitation": "0 %",
-      "windSpeed": "17,3 km/h"
+      "precipitation": "99,99 %",
+      "windSpeed": "111,11 km/h"
     },
     {
       "time": "01:00",
-      "conditionText": "Generalmente soleado",
+      "conditionText": "Soleado",
       "temperature": "16,4 °C",
       "apparentTemperature": "17,3 °C",
       "precipitation": "30 %",
