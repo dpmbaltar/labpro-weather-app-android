@@ -20,8 +20,6 @@ import com.example.weatherapp.util.ConnectionException
 import com.example.weatherapp.util.RemoteResponseException
 import com.example.weatherapp.viewmodel.DailyWeatherViewModel
 import com.example.weatherapp.viewmodel.DailyWeatherViewModel.DailyWeatherUiState
-import com.google.android.material.bottomsheet.BottomSheetBehavior
-import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -104,5 +102,7 @@ class DailyWeatherFragment : Fragment() {
 
     companion object {
         private val TAG = DailyWeatherFragment::class.java.simpleName
+
+        fun newInstance() = DailyWeatherFragment()
     }
 }

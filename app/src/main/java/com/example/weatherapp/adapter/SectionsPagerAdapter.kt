@@ -21,13 +21,13 @@ class SectionsPagerAdapter(
     override fun getItem(position: Int): Fragment {
         return when (position) {
             0 -> CurrentWeatherFragment.newInstance()
-            1 -> DailyWeatherNavHostFragment.newInstance()
+            1 -> DailyWeatherFragment.newInstance()
             2 -> HistoricalWeatherFragment.newInstance()
             else -> PlaceholderFragment.newInstance()
         }
     }
 
-    override fun getPageTitle(position: Int): CharSequence? {
+    override fun getPageTitle(position: Int): CharSequence {
         return context.resources.getString(TAB_TITLES[position])
     }
 
