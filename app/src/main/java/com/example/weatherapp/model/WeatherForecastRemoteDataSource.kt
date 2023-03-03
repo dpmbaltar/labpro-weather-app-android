@@ -7,6 +7,8 @@ import com.example.weatherapp.util.isoDate
 import com.example.weatherapp.util.isoDateTimeSimple
 import com.google.gson.Gson
 import java.io.IOException
+import java.net.ConnectException
+import java.net.SocketException
 import java.net.SocketTimeoutException
 import java.util.*
 import javax.inject.Inject
@@ -20,47 +22,35 @@ class WeatherForecastRemoteDataSource @Inject constructor(
     suspend fun fetchCurrentWeather(
         latitude: Double,
         longitude: Double
-    ): CurrentWeatherResponse {
-        try {
-            weatherService.current(latitude, longitude).let {
-                if (it.isSuccessful) {
-                    return it.body()!!
-                } else {
-                    val errorBody: String = it.errorBody()?.string() ?: ""
-                    val json = Gson().fromJson<Map<String, Any>>(errorBody, Map::class.java)
-                    throw RemoteResponseException("Response error", json)
-                }
+    ): CurrentWeatherResponse = try {
+        weatherService.current(latitude, longitude).let { response ->
+            if (response.isSuccessful) {
+                response.body()!!
+            } else {
+                val errorBody: String = response.errorBody()?.string() ?: ""
+                val json = Gson().fromJson<Map<String, Any>>(errorBody, Map::class.java)
+                throw RemoteResponseException("Response error", json)
             }
-        } catch (e: SocketTimeoutException) {
-            throw ConnectionException(e.message)
-        } catch (e: IOException) {
-            throw ConnectionException(e.message)
-        } catch (e: Exception) {
-            throw Exception(e.message)
         }
+    } catch (e: Exception) {
+        throw catchException(e)
     }
 
     suspend fun fetchDailyWeather(
         latitude: Double,
         longitude: Double
-    ): DailyWeatherResponse {
-        return try {
-            weatherService.daily(latitude, longitude).let {
-                if (it.isSuccessful) {
-                    it.body()!!
-                } else {
-                    val errorBody: String = it.errorBody()?.string() ?: ""
-                    val json = Gson().fromJson<Map<String, Any>>(errorBody, Map::class.java)
-                    throw RemoteResponseException("Response error", json)
-                }
+    ): DailyWeatherResponse = try {
+        weatherService.daily(latitude, longitude).let { response ->
+            if (response.isSuccessful) {
+                response.body()!!
+            } else {
+                val errorBody: String = response.errorBody()?.string() ?: ""
+                val json = Gson().fromJson<Map<String, Any>>(errorBody, Map::class.java)
+                throw RemoteResponseException("Response error", json)
             }
-        } catch (e: SocketTimeoutException) {
-            throw ConnectionException(e.message)
-        } catch (e: IOException) {
-            throw ConnectionException(e.message)
-        } catch (e: Exception) {
-            throw Exception(e.message)
         }
+    } catch (e: Exception) {
+        throw catchException(e)
     }
 
     suspend fun fetchHourlyWeather(
@@ -101,12 +91,8 @@ class WeatherForecastRemoteDataSource @Inject constructor(
                 }
             }
         }
-    } catch (e: SocketTimeoutException) {
-        throw ConnectionException(e.message)
-    } catch (e: IOException) {
-        throw ConnectionException(e.message)
     } catch (e: Exception) {
-        throw Exception(e.message)
+        throw catchException(e)
     }
 
     suspend fun fetchHistoricalDailyWeather(
@@ -114,29 +100,31 @@ class WeatherForecastRemoteDataSource @Inject constructor(
         longitude: Double,
         date: Calendar,
         days: Int
-    ): DailyWeatherResponse {
-        return try {
-            weatherService.historical(
-                latitude,
-                longitude,
-                date.coerceAtMost(Calendar.getInstance().apply { add(Calendar.DATE, -7) }).isoDate(),
-                days.coerceAtLeast(-7).coerceAtMost(7)
-            ).let {
-                if (it.isSuccessful) {
-                    it.body()!!
-                } else {
-                    val errorBody: String = it.errorBody()?.string() ?: ""
-                    val json = Gson().fromJson<Map<String, Any>>(errorBody, Map::class.java)
-                    throw RemoteResponseException("Response error", json)
-                }
+    ): DailyWeatherResponse = try {
+        weatherService.historical(
+            latitude,
+            longitude,
+            date.coerceAtMost(Calendar.getInstance().apply { add(Calendar.DATE, -7) }).isoDate(),
+            days.coerceAtLeast(-7).coerceAtMost(7)
+        ).let { response ->
+            if (response.isSuccessful) {
+                response.body()!!
+            } else {
+                val errorBody: String = response.errorBody()?.string() ?: ""
+                val json = Gson().fromJson<Map<String, Any>>(errorBody, Map::class.java)
+                throw RemoteResponseException("Response error", json)
             }
-        } catch (e: SocketTimeoutException) {
-            throw ConnectionException(e.message)
-        } catch (e: IOException) {
-            throw ConnectionException(e.message)
-        } catch (e: Exception) {
-            throw Exception(e.message)
         }
+    } catch (e: Exception) {
+        throw catchException(e)
+    }
+
+    private fun catchException(exception: Exception): Exception = when (exception) {
+        is ConnectException,
+        is SocketException,
+        is SocketTimeoutException,
+        is IOException -> ConnectionException(exception.message)
+        else -> Exception(exception.message)
     }
 
     companion object {
