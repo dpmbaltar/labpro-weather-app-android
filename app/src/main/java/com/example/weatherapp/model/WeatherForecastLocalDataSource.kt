@@ -23,14 +23,16 @@ class WeatherForecastLocalDataSource @Inject constructor(
             locationDao.getWeatherLocation(buildId(latitude, longitude))
         }
 
-    suspend fun getCurrentWeather(latitude: Double, longitude: Double): CurrentWeather? =
-        withContext(coroutineDispatcher) {
-            currentWeatherDao.getCurrentWeather(buildId(latitude, longitude))
-        }
+    suspend fun getWeatherLocationAndCurrentWeather(
+        latitude: Double,
+        longitude: Double
+    ): CurrentWeatherResult? = withContext(coroutineDispatcher) {
+        locationDao.getWeatherLocationAndCurrentWeather(buildId(latitude, longitude))
+    }
 
-    suspend fun insertCurrentWeather(currentWeatherResponse: CurrentWeatherResponse) =
+    suspend fun insertCurrentWeather(currentWeatherResult: CurrentWeatherResult) =
         withContext(coroutineDispatcher) {
-            with(currentWeatherResponse) {
+            with(currentWeatherResult) {
                 val locationId = location.locationId()
                 location.copy(id = locationId).let { locationDao.insert(it) }
                 current.copy(locationId = locationId).let {

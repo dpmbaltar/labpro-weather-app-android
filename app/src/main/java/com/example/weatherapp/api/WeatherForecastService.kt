@@ -1,6 +1,6 @@
 package com.example.weatherapp.api
 
-import com.example.weatherapp.model.CurrentWeatherResponse
+import com.example.weatherapp.model.CurrentWeatherResult
 import com.example.weatherapp.model.DailyWeatherResponse
 import com.example.weatherapp.model.HourlyWeatherResponse
 import okhttp3.OkHttpClient
@@ -19,7 +19,7 @@ interface WeatherForecastService {
     suspend fun current(
         @Query("latitude") latitude: Double,
         @Query("longitude") longitude: Double
-    ): Response<CurrentWeatherResponse>
+    ): Response<CurrentWeatherResult>
 
     @GET("/api/weather/daily")
     suspend fun daily(

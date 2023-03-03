@@ -22,7 +22,7 @@ class WeatherForecastRemoteDataSource @Inject constructor(
     suspend fun fetchCurrentWeather(
         latitude: Double,
         longitude: Double
-    ): CurrentWeatherResponse = try {
+    ): CurrentWeatherResult = try {
         weatherService.current(latitude, longitude).let { response ->
             if (response.isSuccessful) {
                 response.body()!!

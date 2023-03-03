@@ -16,10 +16,10 @@ class WeatherForecastRepository @Inject constructor(
     suspend fun getCurrentWeather(
         latitude: Double,
         longitude: Double
-    ): Flow<CurrentWeatherResponse> = flow {
-        localWeather.getWeatherLocation(latitude, longitude)?.let { location ->
-            localWeather.getCurrentWeather(latitude, longitude)?.let { current ->
-                emit(CurrentWeatherResponse(location, current))
+    ): Flow<CurrentWeatherResult> = flow {
+        localWeather.getWeatherLocationAndCurrentWeather(latitude, longitude)?.let {
+            with(it) {
+                emit(CurrentWeatherResult(location, current))
                 if (!current.isOld()) return@flow
             }
         }
