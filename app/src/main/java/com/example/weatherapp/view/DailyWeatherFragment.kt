@@ -27,6 +27,11 @@ import kotlinx.coroutines.launch
 @AndroidEntryPoint
 class DailyWeatherFragment : Fragment() {
 
+    companion object {
+        private val TAG = DailyWeatherFragment::class.java.simpleName
+        fun newInstance() = DailyWeatherFragment()
+    }
+
     private var hourlyWeatherFragment: HourlyWeatherFragment? = null
     private lateinit var dailyWeatherAdapter: DailyWeatherAdapter
     private lateinit var recyclerView: RecyclerView
@@ -104,11 +109,5 @@ class DailyWeatherFragment : Fragment() {
                 .setAction("Action", null)
                 .show()
         }
-    }
-
-    companion object {
-        private val TAG = DailyWeatherFragment::class.java.simpleName
-
-        fun newInstance() = DailyWeatherFragment()
     }
 }

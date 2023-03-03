@@ -25,6 +25,11 @@ import kotlinx.coroutines.launch
 @AndroidEntryPoint
 class CurrentWeatherFragment : Fragment() {
 
+    companion object {
+        private val TAG = CurrentWeatherFragment::class.java.simpleName
+        fun newInstance() = CurrentWeatherFragment()
+    }
+
     private lateinit var refreshView: SwipeRefreshLayout
     private lateinit var viewModel: CurrentWeatherViewModel
     private var _binding: FragmentCurrentWeatherBinding? = null
@@ -93,11 +98,5 @@ class CurrentWeatherFragment : Fragment() {
                 .setAction("Action", null)
                 .show()
         }
-    }
-
-    companion object {
-        private val TAG = CurrentWeatherFragment::class.java.simpleName
-
-        fun newInstance() = CurrentWeatherFragment()
     }
 }
