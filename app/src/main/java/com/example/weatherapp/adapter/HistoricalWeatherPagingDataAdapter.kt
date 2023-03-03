@@ -7,10 +7,10 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.weatherapp.adapter.HistoricalWeatherPagingDataAdapter.DailyWeatherViewHolder
 import com.example.weatherapp.databinding.DailyWeatherItemBinding
-import com.example.weatherapp.viewmodel.HistoricalWeatherViewModel.DailyWeatherUiState
+import com.example.weatherapp.viewmodel.HistoricalWeatherViewModel.DailyWeatherUiModel
 
 class HistoricalWeatherPagingDataAdapter :
-    PagingDataAdapter<DailyWeatherUiState, DailyWeatherViewHolder>(DiffCallback) {
+    PagingDataAdapter<DailyWeatherUiModel, DailyWeatherViewHolder>(DiffCallback) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DailyWeatherViewHolder {
         return DailyWeatherViewHolder(
@@ -28,7 +28,7 @@ class HistoricalWeatherPagingDataAdapter :
         private val binding: DailyWeatherItemBinding
     ) : RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(dailyWeather: DailyWeatherUiState?) {
+        fun bind(dailyWeather: DailyWeatherUiModel?) {
             dailyWeather?.let {
                 with(dailyWeather) {
                     binding.date.text = time
@@ -42,16 +42,16 @@ class HistoricalWeatherPagingDataAdapter :
     }
 
     companion object {
-        private val DiffCallback = object : DiffUtil.ItemCallback<DailyWeatherUiState>() {
+        private val DiffCallback = object : DiffUtil.ItemCallback<DailyWeatherUiModel>() {
 
             override fun areItemsTheSame(
-                oldItem: DailyWeatherUiState,
-                newItem: DailyWeatherUiState
+                oldItem: DailyWeatherUiModel,
+                newItem: DailyWeatherUiModel
             ): Boolean = oldItem.time == newItem.time
 
             override fun areContentsTheSame(
-                oldItem: DailyWeatherUiState,
-                newItem: DailyWeatherUiState
+                oldItem: DailyWeatherUiModel,
+                newItem: DailyWeatherUiModel
             ): Boolean = oldItem == newItem
         }
     }

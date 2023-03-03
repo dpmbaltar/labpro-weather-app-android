@@ -19,7 +19,7 @@ import com.example.weatherapp.databinding.FragmentDailyWeatherBinding
 import com.example.weatherapp.util.ConnectionException
 import com.example.weatherapp.util.RemoteResponseException
 import com.example.weatherapp.viewmodel.DailyWeatherViewModel
-import com.example.weatherapp.viewmodel.DailyWeatherViewModel.DailyWeatherUiState
+import com.example.weatherapp.viewmodel.DailyWeatherViewModel.DailyWeatherUiModel
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -52,7 +52,7 @@ class DailyWeatherFragment : Fragment() {
         _binding = FragmentDailyWeatherBinding.inflate(inflater, container, false)
         val view = binding.root
 
-        dailyWeatherAdapter = DailyWeatherAdapter { dailyWeather, position ->
+        dailyWeatherAdapter = DailyWeatherAdapter { dailyWeather, _ ->
             val contentView = with(dailyWeather) {
                 HourlyWeatherFragment.newInstance(latitude, longitude, date, sunrise, sunset)
             }
@@ -60,9 +60,11 @@ class DailyWeatherFragment : Fragment() {
             activity?.supportFragmentManager?.let { contentView.show(it, contentView.tag) }
         }
 
-        recyclerView = binding.dailyWeather
-        recyclerView.layoutManager = LinearLayoutManager(requireContext())
-        recyclerView.adapter = dailyWeatherAdapter
+        recyclerView = binding.dailyWeather.apply {
+            layoutManager = LinearLayoutManager(requireContext())
+            adapter = dailyWeatherAdapter
+        }
+
         refreshView = binding.swipeRefresh.apply {
             setOnRefreshListener {
                 lifecycleScope.launch { viewModel.refresh() }
@@ -76,7 +78,7 @@ class DailyWeatherFragment : Fragment() {
         return view
     }
 
-    private fun showDailyWeather(data: List<DailyWeatherUiState>) {
+    private fun showDailyWeather(data: List<DailyWeatherUiModel>) {
         dailyWeatherAdapter.submitList(data)
     }
 

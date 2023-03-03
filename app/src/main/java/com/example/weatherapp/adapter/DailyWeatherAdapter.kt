@@ -7,11 +7,11 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.weatherapp.adapter.DailyWeatherAdapter.DailyWeatherViewHolder
 import com.example.weatherapp.databinding.DailyWeatherItemBinding
-import com.example.weatherapp.viewmodel.DailyWeatherViewModel.DailyWeatherUiState
+import com.example.weatherapp.viewmodel.DailyWeatherViewModel.DailyWeatherUiModel
 
 class DailyWeatherAdapter(
-    private val onItemClicked: (DailyWeatherUiState, Int) -> Unit
-) : ListAdapter<DailyWeatherUiState, DailyWeatherViewHolder>(DiffCallback) {
+    private val onItemClicked: (DailyWeatherUiModel, Int) -> Unit
+) : ListAdapter<DailyWeatherUiModel, DailyWeatherViewHolder>(DiffCallback) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DailyWeatherViewHolder {
         val viewHolder = DailyWeatherViewHolder(
@@ -37,7 +37,7 @@ class DailyWeatherAdapter(
         private var binding: DailyWeatherItemBinding
     ) : RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(dailyWeather: DailyWeatherUiState) {
+        fun bind(dailyWeather: DailyWeatherUiModel) {
             with(dailyWeather) {
                 binding.date.text = time
                 binding.temperatureMax.text = temperatureMax
@@ -49,16 +49,16 @@ class DailyWeatherAdapter(
     }
 
     companion object {
-        private val DiffCallback = object : DiffUtil.ItemCallback<DailyWeatherUiState>() {
+        private val DiffCallback = object : DiffUtil.ItemCallback<DailyWeatherUiModel>() {
 
             override fun areItemsTheSame(
-                oldItem: DailyWeatherUiState,
-                newItem: DailyWeatherUiState
+                oldItem: DailyWeatherUiModel,
+                newItem: DailyWeatherUiModel
             ): Boolean = oldItem.time == newItem.time
 
             override fun areContentsTheSame(
-                oldItem: DailyWeatherUiState,
-                newItem: DailyWeatherUiState
+                oldItem: DailyWeatherUiModel,
+                newItem: DailyWeatherUiModel
             ): Boolean = oldItem == newItem
         }
     }

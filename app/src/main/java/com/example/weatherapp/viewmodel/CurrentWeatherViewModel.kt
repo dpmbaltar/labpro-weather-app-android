@@ -11,6 +11,7 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import java.util.*
 import javax.inject.Inject
+import com.example.weatherapp.util.Result as FlowResult
 
 @SuppressLint("MissingPermission")
 @HiltViewModel
@@ -19,20 +20,7 @@ class CurrentWeatherViewModel @Inject constructor(
     private val weatherRepository: WeatherForecastRepository
 ) : ViewModel() {
 
-    private sealed interface UiState {
-
-        object Loading : UiState
-
-        data class Success(
-            val data: CurrentWeatherResponse
-        ) : UiState
-
-        data class Error(
-            val throwable: Throwable? = null
-        ) : UiState
-    }
-
-    data class CurrentWeatherUiState(
+    data class CurrentWeatherUiModel(
         val time: String,
         val temperature: String,
         val apparentTemperature: String,
@@ -47,17 +35,18 @@ class CurrentWeatherViewModel @Inject constructor(
         val locationName: String
     )
 
-    private val _uiState = MutableStateFlow<UiState>(UiState.Loading)
+    private val _uiState = MutableStateFlow<FlowResult<CurrentWeatherResponse>>(FlowResult.Loading)
     private val _location = MutableLiveData<Location>()
     private val location get() = _location.asFlow()
 
-    val error: Flow<Throwable?> = _uiState.filterIsInstance<UiState.Error>().map { it.throwable }
-    val loading: Flow<Boolean> = _uiState.map { it is UiState.Loading }
-    val currentWeather: Flow<CurrentWeatherUiState> = _uiState.filterIsInstance<UiState.Success>()
+    val error: Flow<Throwable?> = _uiState.filterIsInstance<FlowResult.Error>().map { it.exception }
+    val loading: Flow<Boolean> = _uiState.map { it is FlowResult.Loading }
+    val currentWeather: Flow<CurrentWeatherUiModel> = _uiState
+        .filterIsInstance<FlowResult.Success<CurrentWeatherResponse>>()
         .map { uiState ->
             uiState.data.let { weather ->
                 with(weather.current) {
-                    CurrentWeatherUiState(
+                    CurrentWeatherUiModel(
                         time = time.weekdayDateMonth(),
                         temperature = temperature.degreesCelsius(),
                         apparentTemperature = apparentTemperature.degreesCelsius(),
@@ -78,15 +67,10 @@ class CurrentWeatherViewModel @Inject constructor(
     fun refresh() = viewModelScope.launch {
         location.collect {
             with(it) {
-                weatherRepository.getCurrentWeather(latitude, longitude).asResult()
+                weatherRepository.getCurrentWeather(latitude, longitude)
+                    .asResult()
                     .collect { result ->
-                        _uiState.update {
-                            when (result) {
-                                is Result.Loading -> UiState.Loading
-                                is Result.Success -> UiState.Success(result.data)
-                                is Result.Error -> UiState.Error(result.exception)
-                            }
-                        }
+                        _uiState.update { result }
                     }
             }
         }

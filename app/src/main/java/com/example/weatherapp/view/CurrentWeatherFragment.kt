@@ -17,7 +17,7 @@ import com.example.weatherapp.util.ConnectionException
 import com.example.weatherapp.util.RemoteResponseException
 import com.example.weatherapp.util.WeatherIcon
 import com.example.weatherapp.viewmodel.CurrentWeatherViewModel
-import com.example.weatherapp.viewmodel.CurrentWeatherViewModel.CurrentWeatherUiState
+import com.example.weatherapp.viewmodel.CurrentWeatherViewModel.CurrentWeatherUiModel
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -60,7 +60,7 @@ class CurrentWeatherFragment : Fragment() {
         return binding.root
     }
 
-    private fun showCurrentWeather(data: CurrentWeatherUiState) {
+    private fun showCurrentWeather(data: CurrentWeatherUiModel) {
         with(data) {
             val icon = WeatherIcon.getDrawableId(conditionIcon, isDay)
             binding.temperature.setCompoundDrawablesWithIntrinsicBounds(icon, 0, 0, 0)

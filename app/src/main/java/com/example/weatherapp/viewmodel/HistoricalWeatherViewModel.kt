@@ -21,7 +21,7 @@ class HistoricalWeatherViewModel @Inject constructor(
     private val locationProviderClient: FusedLocationProviderClient
 ) : ViewModel() {
 
-    data class DailyWeatherUiState(
+    data class DailyWeatherUiModel(
         val time: String,
         val temperatureMax: String,
         val temperatureMin: String,
@@ -29,12 +29,12 @@ class HistoricalWeatherViewModel @Inject constructor(
         val conditionIcon: Int
     )
 
-    val daily: Flow<PagingData<DailyWeatherUiState>> = Pager(PagingConfig(pageSize = PAGE_SIZE)) {
+    val daily: Flow<PagingData<DailyWeatherUiModel>> = Pager(PagingConfig(pageSize = PAGE_SIZE)) {
         HistoricalWeatherPagingSource(weatherRepository, locationProviderClient)
     }.flow.map { pagingData ->
         pagingData.map { dailyWeather ->
             with(dailyWeather) {
-                DailyWeatherUiState(
+                DailyWeatherUiModel(
                     time = time.weekdayDateMonth(),
                     temperatureMax = temperatureMax.degreesCelsius(),
                     temperatureMin = temperatureMin.degreesCelsius(),

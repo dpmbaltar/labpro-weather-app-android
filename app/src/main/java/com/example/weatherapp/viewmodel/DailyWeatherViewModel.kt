@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import java.util.*
 import javax.inject.Inject
+import com.example.weatherapp.util.Result as FlowResult
 
 @SuppressLint("MissingPermission")
 @HiltViewModel
@@ -22,20 +23,7 @@ class DailyWeatherViewModel @Inject constructor(
     private val weatherRepository: WeatherForecastRepository
 ) : ViewModel() {
 
-    private sealed interface UiState {
-
-        object Loading : UiState
-
-        data class Success(
-            val data: DailyWeatherResponse
-        ) : UiState
-
-        data class Error(
-            val throwable: Throwable? = null
-        ) : UiState
-    }
-
-    data class DailyWeatherUiState(
+    data class DailyWeatherUiModel(
         val time: String,
         val temperatureMax: String,
         val temperatureMin: String,
@@ -48,17 +36,18 @@ class DailyWeatherViewModel @Inject constructor(
         val longitude: Double
     )
 
-    private val _uiState = MutableStateFlow<UiState>(UiState.Loading)
+    private val _uiState = MutableStateFlow<FlowResult<DailyWeatherResponse>>(FlowResult.Loading)
     private val _location = MutableLiveData<Location>()
     private val location: Flow<Location> get() = _location.asFlow()
 
-    val error: Flow<Throwable?> = _uiState.filterIsInstance<UiState.Error>().map { it.throwable }
-    val loading: Flow<Boolean> = _uiState.map { it is UiState.Loading }
-    val dailyWeather: Flow<List<DailyWeatherUiState>> = _uiState.filterIsInstance<UiState.Success>()
+    val error: Flow<Throwable?> = _uiState.filterIsInstance<FlowResult.Error>().map { it.exception }
+    val loading: Flow<Boolean> = _uiState.map { it is FlowResult.Loading }
+    val dailyWeather: Flow<List<DailyWeatherUiModel>> = _uiState
+        .filterIsInstance<FlowResult.Success<DailyWeatherResponse>>()
         .map { uiState ->
             uiState.data.daily.mapIndexed { _, dailyWeather ->
                 with(dailyWeather) {
-                    DailyWeatherUiState(
+                    DailyWeatherUiModel(
                         time = time.weekdayDate(),
                         temperatureMax = temperatureMax.degreesCelsius(),
                         temperatureMin = temperatureMin.degreesCelsius(),
@@ -77,15 +66,10 @@ class DailyWeatherViewModel @Inject constructor(
     fun refresh() = viewModelScope.launch {
         location.collect {
             with(it) {
-                weatherRepository.getDailyWeather(latitude, longitude).asResult()
+                weatherRepository.getDailyWeather(latitude, longitude)
+                    .asResult()
                     .collect { result ->
-                        _uiState.update {
-                            when (result) {
-                                is Result.Loading -> UiState.Loading
-                                is Result.Success -> UiState.Success(result.data)
-                                is Result.Error -> UiState.Error(result.exception)
-                            }
-                        }
+                        _uiState.update { result }
                     }
             }
         }
