@@ -3,6 +3,7 @@ package com.example.weatherapp.api
 import com.example.weatherapp.model.CurrentWeatherResult
 import com.example.weatherapp.model.DailyWeatherResult
 import com.example.weatherapp.model.HourlyWeatherResult
+import com.example.weatherapp.util.API_BASE_URL
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import okhttp3.logging.HttpLoggingInterceptor.Level
@@ -46,7 +47,7 @@ interface WeatherForecastService {
     ): Response<DailyWeatherResult>
 
     companion object {
-        private const val BASE_URL = "http://192.168.0.239:9000/"
+        private const val BASE_URL = API_BASE_URL
 
         fun create(): WeatherForecastService {
             val logger = HttpLoggingInterceptor().apply { level = Level.BASIC }

@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import com.example.weatherapp.util.PAGE_SIZE
 import java.util.*
 import java.util.Calendar.DATE
 
@@ -18,7 +19,7 @@ interface DailyWeatherDao {
     fun getDailyWeather(
         locationId: String,
         after: Date = Calendar.getInstance().apply { add(DATE, -1) }.time,
-        limit: Int = 7
+        limit: Int = PAGE_SIZE
     ): List<DailyWeather>
 
     @Query(
@@ -30,7 +31,7 @@ interface DailyWeatherDao {
         locationId: String,
         from: Calendar,
         to: Calendar,
-        limit: Int = 7
+        limit: Int = PAGE_SIZE
     ): List<DailyWeather>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)

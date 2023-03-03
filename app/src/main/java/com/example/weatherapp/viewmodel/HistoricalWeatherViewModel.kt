@@ -4,8 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.*
 import com.example.weatherapp.model.HistoricalWeatherPagingSource
-import com.example.weatherapp.model.PAGE_SIZE
 import com.example.weatherapp.model.WeatherForecastRepository
+import com.example.weatherapp.util.PAGE_SIZE
 import com.example.weatherapp.util.degreesCelsius
 import com.example.weatherapp.util.weatherIcon
 import com.example.weatherapp.util.weekdayDateMonth

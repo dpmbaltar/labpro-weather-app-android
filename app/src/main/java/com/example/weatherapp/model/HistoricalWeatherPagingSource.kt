@@ -4,13 +4,12 @@ import android.annotation.SuppressLint
 import android.location.Location
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
+import com.example.weatherapp.util.PAGE_SIZE
 import com.google.android.gms.location.FusedLocationProviderClient
 import kotlinx.coroutines.flow.single
 import java.util.*
 import java.util.Calendar.*
 import javax.inject.Inject
-
-const val PAGE_SIZE = 7
 
 @SuppressLint("MissingPermission")
 class HistoricalWeatherPagingSource @Inject constructor(

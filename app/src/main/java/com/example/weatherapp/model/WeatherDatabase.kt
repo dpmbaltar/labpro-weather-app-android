@@ -5,6 +5,7 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
+import com.example.weatherapp.util.DATABASE_NAME
 
 @Database(
     entities = [
@@ -34,7 +35,7 @@ abstract class WeatherDatabase : RoomDatabase() {
                 instance ?: Room.databaseBuilder(
                     context.applicationContext,
                     WeatherDatabase::class.java,
-                    "weather_database"
+                    DATABASE_NAME
                 ).build().also { instance = it }
             }
         }
