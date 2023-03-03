@@ -21,8 +21,7 @@ class AppModule {
     @Provides
     fun providesFusedLocationProviderClient(
         @ApplicationContext context: Context
-    ): FusedLocationProviderClient =
-        LocationServices.getFusedLocationProviderClient(context)
+    ): FusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(context)
 
     @Singleton
     @Provides
@@ -30,12 +29,14 @@ class AppModule {
         locationDao: WeatherLocationDao,
         currentWeatherDao: CurrentWeatherDao,
         dailyWeatherDao: DailyWeatherDao,
+        hourlyWeatherDao: HourlyWeatherDao,
         @IoDispatcher coroutineDispatcher: CoroutineDispatcher
     ): WeatherForecastLocalDataSource =
         WeatherForecastLocalDataSource.getInstance(
             locationDao,
             currentWeatherDao,
             dailyWeatherDao,
+            hourlyWeatherDao,
             coroutineDispatcher
         )
 
@@ -49,13 +50,8 @@ class AppModule {
     @Singleton
     @Provides
     fun providesWeatherForecastRepository(
-        weatherService: WeatherForecastService,
         weatherLocalDataSource: WeatherForecastLocalDataSource,
         weatherRemoteDataSource: WeatherForecastRemoteDataSource
     ): WeatherForecastRepository =
-        WeatherForecastRepository.getInstance(
-            weatherService,
-            weatherLocalDataSource,
-            weatherRemoteDataSource
-        )
+        WeatherForecastRepository.getInstance(weatherLocalDataSource, weatherRemoteDataSource)
 }
