@@ -114,14 +114,21 @@
             app:cardPreventCornerOverlap="true"
             app:cardUseCompatPadding="false">
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/hourly_weather"
+            <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+                android:id="@+id/swipe_refresh"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:clipToPadding="false"
-                android:padding="10dp"
-                tools:itemCount="24"
-                tools:listitem="@layout/hourly_weather_item" />
+                android:layout_height="match_parent">
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/hourly_weather"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:clipToPadding="false"
+                    android:padding="10dp"
+                    tools:itemCount="24"
+                    tools:listitem="@layout/hourly_weather_item" />
+
+            </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
         </androidx.cardview.widget.CardView>
 
