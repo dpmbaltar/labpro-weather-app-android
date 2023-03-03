@@ -1,20 +1,14 @@
 package com.example.weatherapp.model
 
-import android.annotation.SuppressLint
-import com.example.weatherapp.api.WeatherForecastService
-import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import retrofit2.Response
 import java.util.*
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.math.absoluteValue
 
 @Singleton
-@SuppressLint("MissingPermission")
 class WeatherForecastRepository @Inject constructor(
-    private val weatherService: WeatherForecastService,
     private val localWeather: WeatherForecastLocalDataSource,
     private val remoteWeather: WeatherForecastRemoteDataSource
 ) {
@@ -61,7 +55,7 @@ class WeatherForecastRepository @Inject constructor(
         longitude: Double,
         date: Calendar,
         days: Int
-    ): Flow <DailyWeatherResponse> = flow {
+    ): Flow<DailyWeatherResponse> = flow {
         localWeather.getWeatherLocation(latitude, longitude)?.let { location ->
             localWeather.getHistoricalDailyWeather(latitude, longitude, date, days).let { daily ->
                 if (daily.size == days.absoluteValue) {
@@ -77,18 +71,15 @@ class WeatherForecastRepository @Inject constructor(
         }
     }
 
-    suspend fun getHourly(
+    suspend fun getHourlyWeather(
         latitude: Double,
         longitude: Double,
-        date: Calendar
-    ): Response<HourlyWeatherResponse> {
-        return weatherService.hourly(
-            date.get(Calendar.YEAR),
-            date.get(Calendar.MONTH) + 1,
-            date.get(Calendar.DAY_OF_MONTH),
-            latitude,
-            longitude
-        )
+        date: Calendar,
+
+        ): Flow<List<HourlyWeather>> = flow {
+        remoteWeather.fetchHourlyWeather(latitude, longitude, date).let {
+            emit(it)
+        }
     }
 
     companion object {
@@ -97,13 +88,11 @@ class WeatherForecastRepository @Inject constructor(
         private var instance: WeatherForecastRepository? = null
 
         fun getInstance(
-            weatherService: WeatherForecastService,
             weatherLocalDataSource: WeatherForecastLocalDataSource,
             weatherRemoteDataSource: WeatherForecastRemoteDataSource
         ) =
             instance ?: synchronized(this) {
                 instance ?: WeatherForecastRepository(
-                    weatherService,
                     weatherLocalDataSource,
                     weatherRemoteDataSource
                 ).also { instance = it }

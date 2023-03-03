@@ -14,6 +14,7 @@ class WeatherForecastLocalDataSource @Inject constructor(
     private val locationDao: WeatherLocationDao,
     private val currentWeatherDao: CurrentWeatherDao,
     private val dailyWeatherDao: DailyWeatherDao,
+    private val hourlyWeatherDao: HourlyWeatherDao,
     @IoDispatcher private val coroutineDispatcher: CoroutineDispatcher
 ) {
 
@@ -61,6 +62,27 @@ class WeatherForecastLocalDataSource @Inject constructor(
             }
         }
 
+    suspend fun getHourlyWeather(
+        latitude: Double,
+        longitude: Double,
+        date: Date
+    ): List<HourlyWeather> =
+        withContext(coroutineDispatcher) {
+            hourlyWeatherDao.getHourlyWeather(date, buildId(latitude, longitude))
+        }
+
+    suspend fun insertHourlyWeather(
+        weatherLocation: WeatherLocation,
+        dailyWeather: DailyWeather,
+        hourlyWeather: HourlyWeather
+    ) =
+        withContext(coroutineDispatcher) {
+            hourlyWeather.copy(date = dailyWeather.time, locationId = weatherLocation.locationId())
+                .let {
+                    hourlyWeatherDao.insert(it)
+                }
+        }
+
     suspend fun getHistoricalDailyWeather(
         latitude: Double,
         longitude: Double,
@@ -104,6 +126,7 @@ class WeatherForecastLocalDataSource @Inject constructor(
             locationDao: WeatherLocationDao,
             currentWeatherDao: CurrentWeatherDao,
             dailyWeatherDao: DailyWeatherDao,
+            hourlyWeatherDao: HourlyWeatherDao,
             coroutineDispatcher: CoroutineDispatcher
         ) =
             instance ?: synchronized(this) {
@@ -111,6 +134,7 @@ class WeatherForecastLocalDataSource @Inject constructor(
                     locationDao,
                     currentWeatherDao,
                     dailyWeatherDao,
+                    hourlyWeatherDao,
                     coroutineDispatcher
                 ).also { instance = it }
             }
