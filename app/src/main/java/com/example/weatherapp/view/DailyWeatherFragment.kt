@@ -27,6 +27,7 @@ import kotlinx.coroutines.launch
 @AndroidEntryPoint
 class DailyWeatherFragment : Fragment() {
 
+    private var hourlyWeatherFragment: HourlyWeatherFragment? = null
     private lateinit var dailyWeatherAdapter: DailyWeatherAdapter
     private lateinit var recyclerView: RecyclerView
     private lateinit var refreshView: SwipeRefreshLayout
@@ -53,11 +54,13 @@ class DailyWeatherFragment : Fragment() {
         val view = binding.root
 
         dailyWeatherAdapter = DailyWeatherAdapter { dailyWeather, _ ->
-            val contentView = with(dailyWeather) {
+            hourlyWeatherFragment = with(dailyWeather) {
                 HourlyWeatherFragment.newInstance(latitude, longitude, date, sunrise, sunset)
+            }.apply {
+                this@DailyWeatherFragment.activity?.supportFragmentManager?.let {
+                    show(it, tag)
+                }
             }
-
-            activity?.supportFragmentManager?.let { contentView.show(it, contentView.tag) }
         }
 
         recyclerView = binding.dailyWeather.apply {
@@ -95,6 +98,7 @@ class DailyWeatherFragment : Fragment() {
             else -> getString(R.string.unknown_exception)
         }
 
+        hourlyWeatherFragment?.dismiss()
         activity?.findViewById<View>(R.id.main_layout)?.let { view ->
             Snackbar.make(view, message, Snackbar.LENGTH_LONG)
                 .setAction("Action", null)
