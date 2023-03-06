@@ -1,5 +1,6 @@
 package com.example.weatherapp.model
 
+import com.example.weatherapp.model.WeatherLocation.Companion.buildId
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import java.util.*
@@ -24,9 +25,17 @@ class WeatherForecastRepository @Inject constructor(
             }
         }
 
-        remoteWeather.fetchCurrentWeather(latitude, longitude).let {
-            localWeather.insertCurrentWeather(it)
-            emit(it)
+        remoteWeather.fetchCurrentWeather(latitude, longitude).let { result ->
+            result.copy(
+                location = result.location.copy(
+                    id = buildId(latitude, longitude),
+                    latitude = latitude,
+                    longitude = longitude
+                )
+            ).let { new ->
+                localWeather.insertCurrentWeather(new)
+                emit(new)
+            }
         }
     }
 
@@ -46,9 +55,17 @@ class WeatherForecastRepository @Inject constructor(
             }
         }
 
-        remoteWeather.fetchDailyWeather(latitude, longitude).let {
-            localWeather.insertDailyWeather(it)
-            emit(it)
+        remoteWeather.fetchDailyWeather(latitude, longitude).let { result ->
+            result.copy(
+                location = result.location.copy(
+                    id = buildId(latitude, longitude),
+                    latitude = latitude,
+                    longitude = longitude
+                )
+            ).let {
+                localWeather.insertDailyWeather(it)
+                emit(it)
+            }
         }
     }
 
@@ -67,9 +84,17 @@ class WeatherForecastRepository @Inject constructor(
             }
         }
 
-        remoteWeather.fetchHistoricalDailyWeather(latitude, longitude, date, days).let {
-            localWeather.insertHistoricalDailyWeather(it)
-            emit(it)
+        remoteWeather.fetchHistoricalDailyWeather(latitude, longitude, date, days).let { result ->
+            result.copy(
+                location = result.location.copy(
+                    id = buildId(latitude, longitude),
+                    latitude = latitude,
+                    longitude = longitude
+                )
+            ).let {
+                localWeather.insertHistoricalDailyWeather(it)
+                emit(it)
+            }
         }
     }
 
