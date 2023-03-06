@@ -24,6 +24,6 @@ data class WeatherLocation(
 
     companion object {
         fun buildId(latitude: Double, longitude: Double): String =
-            String.format(Locale.US, "%.2f,%.2f", latitude, longitude)
+            String.format(Locale.US, "%.1f,%.1f", latitude, longitude)
     }
 }
