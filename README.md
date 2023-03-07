@@ -38,3 +38,8 @@ const val API_BASE_URL = "http://192.168.0.239:9000/"
 
 5. Al ejecutar la app la primera vez se solicita permisos para obtener la
    ubicación; deben aceptarse para que funcione, de lo contrario se cierra.
+
+
+Observaciones: para que funcione en el emulador de Android Studio, se debe establecer la ubicación
+desde las opciones del dispositivo (botón con 3 puntos) una vez iniciado, y se deben activar los
+servicios de Google Play (probado en API 30+).
